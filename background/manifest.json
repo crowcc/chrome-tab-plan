@@ -1,0 +1,36 @@
+{
+  "manifest_version": 2,
+  "name": "tabs plan",
+  "version": "1.0",
+  "description": "manage tabs and plan and etc.!",
+  "author": "CaoChang <crowcc@foxmail.com>",
+  "default_locale": "en",
+  "icons": {
+    "16": "img/icon16.png",
+    "32": "img/icon32.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "img/icon16.png",
+      "32": "img/icon32.png",
+      "48": "img/icon48.png",
+      "128": "img/icon128.png"
+    }
+  },
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "tabs",
+    "history",
+    "identity",
+    "notifications"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "options_page": "options.html",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

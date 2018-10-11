@@ -1,0 +1,14 @@
+{
+  "showAdminPage": {
+    "message": "显示管理页面"
+  },
+  "storeCurrentTab": {
+    "message": "保存当前页面标签"
+  },
+  "storeCurrentWindowTabs": {
+    "message": "保存当前窗口标签"
+  },
+  "storeAllWindowTabs": {
+    "message": "保存所有窗口标签"
+  }
+}

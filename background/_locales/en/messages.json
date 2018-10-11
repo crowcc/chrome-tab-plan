@@ -1,0 +1,14 @@
+{
+  "showAdminPage": {
+    "message": "show admin page"
+  },
+  "storeCurrentTab": {
+    "message": "store current tab"
+  },
+  "storeCurrentWindowTabs": {
+    "message": "store all tabs in current window"
+  },
+  "storeAllWindowTabs": {
+    "message": "store all tabs in all window"
+  }
+}
