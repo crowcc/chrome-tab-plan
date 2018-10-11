@@ -2,7 +2,7 @@
   <div class="tablist">
     <Card class="box-card">
       <div slot="header" class="clearfix">
-        <Input v-show="editingTitle" ref="titleInput" v-model="titleVal" placeholder="请输入标题" @blur="saveTitle" />
+        <Input v-show="editingTitle" ref="titleInput" v-model="titleVal" placeholder="请输入标题" @blur="saveTitle" @keyup.enter.native="saveTitle" />
         <div v-show="!editingTitle" class='title-line'>
           <div class='block-title-line' @click="collapseTabs">
             <i  :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
@@ -15,10 +15,21 @@
         </div>
       </div>
       <CollapseTransition>
-        <Draggable v-show='!blockItem.collapse' class='tab-list' v-model="tablist" :options="{group:'tab-item'}" @start="drag=true" @end="drag=false">
+        <Draggable v-show='!blockItem.collapse' class='tab-list' v-model="tablist" :options="{group:'tab-item'}">
           <div v-for="(element,index) in tablist" :key="element.url" class='tab-item'>
             <div class='tab-title' @click='()=>openTabPage(element)'>{{element.title}}</div>
             <div class='tab-action'>
+              <Popover
+                placement="left"
+                width="200"
+                class="action-btn"
+                trigger="hover">
+                <div v-if='!isStatic' class='tab-block-item' @click='()=>moveToBlock(index,0)'>临时</div>
+                <template v-for="(value,bindex) in $store.state.tabstore">
+                  <div class='tab-block-item' :key='bindex' v-if='blockIndex!==bindex' @click='()=>moveToBlock(index,bindex)'>{{value.title}}</div>
+                </template>
+                <Button slot="reference" size="small" type="primary" icon="el-icon-sort" circle @click="editTitle"></Button>
+              </Popover>
               <Button size="small" type="warning" icon="el-icon-edit" circle @click="()=>startEditTab(element,index)"></Button>
               <Button size="small" type="danger" icon="el-icon-delete" circle @click="()=>deleteTab(index)"></Button>
             </div>
@@ -48,7 +59,7 @@
 </template>
 <script>
 import Draggable from 'vuedraggable';
-import { Input, Button, Card, Dialog, Form, FormItem } from 'element-ui';
+import { Input, Button, Card, Dialog, Form, FormItem, Popover } from 'element-ui';
 import { cloneDeep } from 'lodash';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
@@ -95,6 +106,10 @@ export default {
       type: Function,
       default: () => {},
     },
+    blockIndex: {
+      type: Number,
+      default: -1,
+    },
   },
   components: {
     Draggable,
@@ -105,6 +120,7 @@ export default {
     Form,
     FormItem,
     CollapseTransition,
+    Popover,
   },
   computed: {
     tablist: {
@@ -167,6 +183,19 @@ export default {
     collapseTabs() {
       this.changelist('collapse', !this.blockItem.collapse);
     },
+    moveToBlock(index, bindex) {
+      const newBlockItemList = cloneDeep(this.blockItem.list);
+      const moveitem = newBlockItemList.splice(index, 1);
+      console.log(moveitem[0]);
+      this.changelist('list', newBlockItemList);
+      const moveTolist = cloneDeep(this.$store.state.tabstore[bindex].list);
+      moveTolist.unshift(moveitem[0]);
+      this.$store.commit('changeTabBlock', {
+        key: 'list',
+        val: moveTolist,
+        index: bindex,
+      });
+    },
   },
 };
 </script>
@@ -202,7 +231,7 @@ export default {
 }
 .tab-action {
   flex: none;
-  width: 100px;
+  width: 150px;
   text-align: right;
 }
 .block-title-line {
@@ -213,9 +242,21 @@ export default {
 .block-title-name {
   margin-left: 10px;
 }
-.empty-list{
-    text-align: center;
-    color:rgba(0, 0, 0, 0.3)
+.empty-list {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.3);
+}
+.action-btn {
+  margin-right: 10px;
+}
+.tab-block-item {
+  line-height: 26px;
+  padding: 0 10px;
+  &:hover {
+    cursor: pointer;
+    color: #409eff;
+    background-color: #ecf5ff;
+  }
 }
 </style>
 

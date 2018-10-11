@@ -1,5 +1,4 @@
 import { isObject, differenceWith, concat } from 'lodash';
-import store from 'ui/store';
 import browser from 'webextension-polyfill';
 
 export const getCurrentWindow = async () => {
@@ -33,16 +32,14 @@ export const saveAllCurrentWIndowTabs = async () => {
   const windowId = await getCurrentWindow();
   const tabs = await getAllInWindow(windowId);
   let normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
-  const temptabs = await browser.storage.local.get('temptabs');
   const tabstore = await browser.storage.local.get('tabstore');
-  if (temptabs) {
-    normalTbas = differenceWith(normalTbas, temptabs.temptabs.list, (a, b) => a.url === b.url);
-  }
   if (tabstore) {
     tabstore.tabstore.forEach((item) => {
       normalTbas = differenceWith(normalTbas, item.list, (a, b) => a.url === b.url);
     });
   }
   normalTbas = normalTbas.map(item => ({ title: item.title, url: item.url }));
-  store.commit('changeTemp', { key: 'list', val: concat(normalTbas, temptabs.temptabs.list) });
+  const oldTemp = tabstore.tabstore[0].list;
+  tabstore.tabstore[0].list = concat(normalTbas, oldTemp);
+  window.vuexStore.commit('changeTabStore', tabstore.tabstore);
 };

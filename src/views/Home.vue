@@ -6,12 +6,12 @@
     <Button class="import-new">import
       <input id="file" class="import-old" @change="importFile" type="file" accept="application/json">
     </Button>
-    <Button @click='syncRemote'>sync</Button>
-    <Tablist class="tab-card" :blockItem="$store.state.temptabs" :changelist='changeTemp' isStatic></Tablist>
-    <Draggable  v-model="tabstore" :options="{group:'tabstore'}" @start="drag=true" @end="drag=false">
-      <div v-for="(value, index) in tabstore" :key="index" class='tab-group tab-card'>
-        <Tablist :blockItem="value" :changelist='(key,val)=>changeTabEX(key,val,index)' :deleteTabList='()=>deleteTabList(index)'></Tablist>
-      </div>
+    <Button @click='debugStorage'>debug</Button>
+    <Tablist class="tab-card" :blockItem="tabstore[0]" :changelist='(key,val)=>changeTabBlock(key,val,0)' isStatic></Tablist>
+    <Draggable  v-model="tabstore" :options="{group:'tabstore'}">
+      <template v-for="(value, index) in tabstore" >
+        <Tablist v-if='index!==0' class='tab-group tab-card' :key="index" :blockIndex='index' :blockItem="value" :changelist='(key,val)=>changeTabBlock(key,val,index)' :deleteTabList='()=>deleteTabList(index)' :isStatic="index===0"></Tablist>
+      </template>
     </Draggable>
   </div>
 </template>
@@ -47,11 +47,8 @@ export default {
     newlist() {
       this.$store.commit('newTablist');
     },
-    changeTemp(key, val) {
-      this.$store.commit('changeTemp', { key, val });
-    },
-    changeTabEX(key, val, index) {
-      this.$store.commit('changeTabEX', {
+    changeTabBlock(key, val, index) {
+      this.$store.commit('changeTabBlock', {
         key,
         val,
         index,
@@ -85,16 +82,14 @@ export default {
     },
     onReaderLoad(event) {
       const obj = JSON.parse(event.target.result);
-      this.$store.commit('changeTemp', { val: obj.temptabs });
+      //   this.$store.commit('changeTemp', { val: obj.temptabs });
       this.$store.commit('changeTabStore', obj.tabstore);
       this.$store.commit('changeTodoVal', obj.todoVal);
     },
-    async syncRemote() {
+    async debugStorage() {
+      //   browser.storage.local.clear();
       const localData = await browser.storage.local.get();
       console.log(localData);
-    //   browser.storage.sync.set(localData).then((items) => {
-    //     console.log(items);
-    //   });
     },
   },
 };

@@ -1,10 +1,10 @@
 
 import browser from 'webextension-polyfill';
-import store from 'ui/store';
 import { menulist } from './data/contextMenus';
 import { openAdminPage } from './utils';
 
 const generateContextMenus = () => {
+  browser.contextMenus.removeAll();
   Object.keys(menulist).forEach((key) => {
     browser.contextMenus.create({
       id: key,
@@ -25,18 +25,15 @@ const init = async () => {
     openAdminPage();
   });
   // tab
-  browser.storage.local.get('temptabs').then((items) => {
-    store.commit('changeTemp', { val: items.temptabs });
-  });
   browser.storage.local.get('tabstore').then((items) => {
     if (items.tabstore) {
-      store.commit('changeTabStore', items.tabstore);
+      window.vuexStore.commit('changeTabStore', items.tabstore);
     }
   });
   // todo
   browser.storage.local.get('todoVal').then((items) => {
-    store.commit('changeTodoVal', items.todoVal);
+    window.vuexStore.commit('changeTodoVal', items.todoVal);
   });
 };
-export default store;
 init();
+

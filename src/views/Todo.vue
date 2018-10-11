@@ -27,7 +27,7 @@ export default {
     this.textarea = this.$store.state.todoVal;
   },
   watch: {
-    textarea: debounce(function () { this.changeTodoVal(); }, 1000),
+    textarea: debounce(function () { this.changeTodoVal(); }, 300),
     //    throttle(function(){console.log(77)}, 100)()
 
   },

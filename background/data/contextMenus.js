@@ -27,5 +27,3 @@ export const menulist = {
   },
 };
 
-export const aaa = 5;
-
