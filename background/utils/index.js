@@ -1,45 +1,65 @@
-import { isObject, differenceWith, concat } from 'lodash';
+import { differenceWith, concat, uniqBy } from 'lodash';
 import browser from 'webextension-polyfill';
 
 export const getCurrentWindow = async () => {
   const currentWindow = await browser.windows.getCurrent();
   return currentWindow.id;
 };
-export const getAllInWindow = windowId => browser.tabs.query({ windowId });
 
-// 打开管理页面
-export const openAdminPage = async () => {
+export const getTabsByWindow = windowId => browser.tabs.query({ windowId });
+
+export const openAdminPage = async (windowId) => {
   // open only one in a window
-  const window = await browser.runtime.getBackgroundPage();
-  if (!isObject(window.appTabId)) window.appTabId = {};
-  const windowId = await getCurrentWindow();
+  const tabs = await getTabsByWindow(windowId);
   const tabListsUrl = browser.runtime.getURL('index.html#/');
-  if (windowId in window.appTabId) {
-    const tabs = await getAllInWindow(windowId);
-    const tab = tabs.find(item => item.id === window.appTabId[windowId]);
-    if (tab) {
-      if (tab.url.startsWith(tabListsUrl)) {
-        return browser.tabs.update(tab.id, { active: true });
-      }
-      delete window.appTabId[windowId];
-    }
+  const urls = tabs.map(item => item.url);
+  if (urls.indexOf(tabListsUrl) < 0) {
+    await browser.tabs.create({ url: tabListsUrl, windowId });
+  } else {
+    const currentAdminTab = tabs[urls.indexOf(tabListsUrl)];
+    browser.tabs.highlight({ tabs: currentAdminTab.index, windowId: currentAdminTab.windowId });
   }
-  const createdTab = await browser.tabs.create({ url: tabListsUrl });
-  window.appTabId[windowId] = createdTab.id;
 };
-// 保存当前窗口所有标签页
-export const saveAllCurrentWIndowTabs = async () => {
-  const windowId = await getCurrentWindow();
-  const tabs = await getAllInWindow(windowId);
-  let normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
+
+const saveTabs = async (newTabs, windowId) => {
+  browser.tabs.remove(newTabs.map(item => item.id));
   const tabstore = await browser.storage.local.get('tabstore');
   if (tabstore) {
     tabstore.tabstore.forEach((item) => {
-      normalTbas = differenceWith(normalTbas, item.list, (a, b) => a.url === b.url);
+      newTabs = differenceWith(newTabs, item.list, (a, b) => a.url === b.url);
     });
   }
-  normalTbas = normalTbas.map(item => ({ title: item.title, url: item.url }));
+  newTabs = newTabs.map(item => ({ title: item.title, url: item.url }));
   const oldTemp = tabstore.tabstore[0].list;
-  tabstore.tabstore[0].list = concat(normalTbas, oldTemp);
-  window.vuexStore.commit('changeTabStore', tabstore.tabstore);
+  tabstore.tabstore[0].list = concat(newTabs, oldTemp);
+
+  browser.runtime.getBackgroundPage().then((win) => {
+    win.vuestore.commit('changeTabStore', tabstore.tabstore);
+  });
+  openAdminPage(windowId);
 };
+
+export const saveAllCurrentWIndowTabs = async (tab) => {
+  let windowId;
+  if (tab) {
+    windowId = tab.windowId;
+  } else {
+    windowId = await getCurrentWindow();
+  }
+  const tabs = await getTabsByWindow(windowId);
+  const normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
+  saveTabs(normalTbas, windowId);
+};
+
+export const saveAllWIndowTabs = async (tab) => {
+  const tabs = await getTabsByWindow();
+  const normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
+  saveTabs(uniqBy(normalTbas, 'url'), tab.windowId);
+};
+
+export const saveCurrentTab = async (tab) => {
+  if (tab) {
+    saveTabs([tab], tab.windowId);
+  }
+};
+

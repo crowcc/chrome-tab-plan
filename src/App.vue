@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
+      <router-link to="/">Tabs Home</router-link> |
       <router-link to="/todo">Todo</router-link>
     </div>
     <router-view/>
@@ -22,7 +22,7 @@
     font-weight: bold;
     color: #2c3e50;
     &.router-link-exact-active {
-      color: #42b983;
+      color: #409eff;
     }
   }
 }

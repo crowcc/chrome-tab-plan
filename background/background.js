@@ -4,7 +4,6 @@ import { menulist } from './data/contextMenus';
 import { openAdminPage } from './utils';
 
 const generateContextMenus = () => {
-  browser.contextMenus.removeAll();
   Object.keys(menulist).forEach((key) => {
     browser.contextMenus.create({
       id: key,
@@ -14,26 +13,20 @@ const generateContextMenus = () => {
   });
 };
 
-const contextMenusClickedHandler = (info) => {
-  menulist[info.menuItemId].action();
+const contextMenusClickedHandler = (info, tab) => {
+  menulist[info.menuItemId].action(tab);
 };
 
 const init = async () => {
-  generateContextMenus();
-  browser.contextMenus.onClicked.addListener(contextMenusClickedHandler);
-  browser.browserAction.onClicked.addListener(async () => {
-    openAdminPage();
-  });
-  // tab
-  browser.storage.local.get('tabstore').then((items) => {
-    if (items.tabstore) {
-      window.vuexStore.commit('changeTabStore', items.tabstore);
-    }
-  });
-  // todo
-  browser.storage.local.get('todoVal').then((items) => {
-    window.vuexStore.commit('changeTodoVal', items.todoVal);
-  });
+  const window = await browser.runtime.getBackgroundPage();
+  if (!window.backgroundStart) {
+    window.backgroundStart = true;
+    generateContextMenus();
+    browser.contextMenus.onClicked.addListener(contextMenusClickedHandler);
+    browser.browserAction.onClicked.addListener(async (tab) => {
+      openAdminPage(tab.windowId);
+    });
+  }
 };
 init();
 

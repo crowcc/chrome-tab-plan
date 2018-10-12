@@ -6,11 +6,11 @@
     <Button class="import-new">import
       <input id="file" class="import-old" @change="importFile" type="file" accept="application/json">
     </Button>
-    <Button @click='debugStorage'>debug</Button>
-    <Tablist class="tab-card" :blockItem="tabstore[0]" :changelist='(key,val)=>changeTabBlock(key,val,0)' isStatic></Tablist>
+    <!-- <Button @click='debugStorage'>debug</Button> -->
+    <Tablist class="tab-card" :blockItem="tabstore[0]" :changelist='(key,val)=>changeTabBlock(key,val,0)' :deleteTabList='()=>deleteTabList(0)' isStatic></Tablist>
     <Draggable  v-model="tabstore" :options="{group:'tabstore'}">
       <template v-for="(value, index) in tabstore" >
-        <Tablist v-if='index!==0' class='tab-group tab-card' :key="index" :blockIndex='index' :blockItem="value" :changelist='(key,val)=>changeTabBlock(key,val,index)' :deleteTabList='()=>deleteTabList(index)' :isStatic="index===0"></Tablist>
+        <Tablist v-if='index!==0' class='tab-group tab-card' :key="index" :blockIndex='index' :blockItem="value" :changelist='(key,val)=>changeTabBlock(key,val,index)' :deleteTabList='()=>deleteTabList(index)'></Tablist>
       </template>
     </Draggable>
   </div>

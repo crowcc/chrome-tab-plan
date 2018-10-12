@@ -8,8 +8,9 @@
             <i  :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
             <div class="block-title-name" @click="editTitle">{{blockItem.title||'临时'}}</div>
           </div>
-          <div class='tab-action' v-if="!isStatic">
-            <Button size="small" type="warning" icon="el-icon-edit" circle @click="editTitle"></Button>
+          <div class='tab-action'>
+            <Button round size="small" @click="openAll">Open</Button>
+            <Button v-if="!isStatic" size="small" type="warning" icon="el-icon-edit" circle @click="editTitle"></Button>
             <Button size="small" type="danger" icon="el-icon-delete" circle  @click="deleteTabList"></Button>
           </div>
         </div>
@@ -35,10 +36,22 @@
             </div>
           </div>
           <div class='empty-list' v-if="!tablist||!tablist.length">拖入tab以添加</div>
-          <div class="list-place-holder"></div>
         </Draggable>
       </CollapseTransition>
     </Card>
+    <!-- <Dialog
+      title="新建标签组"
+      :visible.sync="addTabBlockVisible">
+      <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
+        <FormItem label="标签名称" prop="title">
+          <Input v-model="tabForm.title" />
+        </FormItem>
+      </Form>
+      <span slot="footer" class="dialog-footer">
+        <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
+        <Button type="primary" @click="editTab">确 定</Button>
+      </span>
+    </Dialog> -->
     <Dialog
       title="修改标签"
       :visible.sync="editTabVisible">
@@ -152,6 +165,11 @@ export default {
       list.splice(index, 1);
       this.changelist('list', list);
     },
+    openAll() {
+      this.blockItem.list.forEach((item) => {
+        this.openTabPage(item);
+      });
+    },
     openTabPage(value) {
       if (value.url.indexOf('https://') < 0 && value.url.indexOf('http://') < 0) {
         window.open(`https://${value.url}`);
@@ -207,32 +225,50 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
+.title-line {
+  &:hover {
+    .tab-action {
+      width: 180px;
+    }
+  }
+}
 .tab-item {
   margin-bottom: 10px;
+  padding: 5px 15px;
+  &:hover {
+    background-color: #ecf5ff;
+     color: #409eff;
+    .tab-action {
+      width: 130px;
+    }
+  }
 }
 .title-line {
   font-weight: 600;
   height: 32px;
 }
 .tab-list {
-  margin: 18px;
+  margin: 0 1px;
   .tab-item:last-child {
     margin-bottom: 0;
   }
-}
-.list-place-holder {
-  height: 1px;
 }
 .tab-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  line-height: 38px;
+  flex: auto;
+  border-radius: 3px;
 }
 .tab-action {
   flex: none;
-  width: 150px;
   text-align: right;
+  width: 0;
+  overflow: hidden;
+  height: 38px;
+  line-height: 38px;
 }
 .block-title-line {
   display: flex;
@@ -245,6 +281,7 @@ export default {
 .empty-list {
   text-align: center;
   color: rgba(0, 0, 0, 0.3);
+  line-height: 100px;
 }
 .action-btn {
   margin-right: 10px;

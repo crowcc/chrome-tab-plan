@@ -39,8 +39,14 @@ const mutations = {
     syncLocalStorage({ tabstore: state.tabstore });
   },
   deleteTabList(state, payload) {
-    state.tabstore.splice(payload, 1);
-    state.tabstore = [...state.tabstore];
+    if (payload === 0) {
+      state.tabstore[0].list = [];
+      state.tabstore = [...state.tabstore];
+    } else {
+      state.tabstore.splice(payload, 1);
+      state.tabstore = [...state.tabstore];
+    }
+
     syncLocalStorage({ tabstore: state.tabstore });
   },
   // clearData(state) {
@@ -54,7 +60,4 @@ const store = new Vuex.Store({
   mutations,
   strict: debug,
 });
-if (!window.vuexStore) {
-  window.vuexStore = store;
-}
-export default window.vuexStore;
+export default store;

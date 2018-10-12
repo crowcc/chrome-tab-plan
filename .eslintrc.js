@@ -18,7 +18,8 @@ module.exports = {
         'vue/html-indent': ['error', 2],
         'vue/script-indent': ['error', 2],
         'import/prefer-default-export':0,
-        'import/no-extraneous-dependencies':0
+        'import/no-extraneous-dependencies':0,
+        'prefer-destructuring':0
     },
     parserOptions: {
         parser: 'babel-eslint',

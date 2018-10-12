@@ -4,7 +4,6 @@
       type="textarea"
       :autosize="{ minRows: 4}"
       placeholder="请输入内容"
-
       v-model="textarea" />
   </div>
 </template>

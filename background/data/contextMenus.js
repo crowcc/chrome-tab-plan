@@ -1,28 +1,28 @@
-import { openAdminPage, saveAllCurrentWIndowTabs } from '../utils';
+import { openAdminPage, saveCurrentTab, saveAllCurrentWIndowTabs, saveAllWIndowTabs } from '../utils';
 
 export const menulist = {
   SHOWADMINPAGE: {
     title: 'showAdminPage',
-    action: () => {
-      openAdminPage();
+    action: (tab) => {
+      openAdminPage(tab.windowId);
     },
   },
   SAVEONE: {
     title: 'storeCurrentTab',
-    action: () => {
-      console.log('保存当前页面标签');
+    action: (tab) => {
+      saveCurrentTab(tab);
     },
   },
   SAVECURRENTALL: {
     title: 'storeCurrentWindowTabs',
-    action: () => {
-      saveAllCurrentWIndowTabs();
+    action: (tab) => {
+      saveAllCurrentWIndowTabs(tab);
     },
   },
   SAVEALL: {
     title: 'storeAllWindowTabs',
-    action: () => {
-      console.log('保存所有窗口标签');
+    action: (tab) => {
+      saveAllWIndowTabs(tab);
     },
   },
 };
