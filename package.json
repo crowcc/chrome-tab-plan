@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "watch": "vue-cli-service build --mode development --watch && rollup -c -w",
+    "watch": "vue-cli-service build --mode development --watch",
+    "watchb": "rollup -c -w",
     "lint": "vue-cli-service lint",
     "build": "vue-cli-service build && rollup -c"
   },

@@ -28,6 +28,5 @@ const init = async () => {
     });
   }
 };
-console.log(66);
 init();
 

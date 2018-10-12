@@ -19,7 +19,7 @@ export default {
   name: 'todo',
   data() {
     return {
-      textarea: '',
+      textarea: this.$store.state.todoVal,
     };
   },
   components: {
@@ -33,7 +33,6 @@ export default {
   },
   methods: {
     changeTodoVal() {
-      console.log(this.textarea);
       this.$store.commit('changeTodoVal', this.textarea);
     },
   },
