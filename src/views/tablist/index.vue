@@ -73,9 +73,11 @@
 <script>
 import Draggable from 'vuedraggable';
 import { Input, Button, Card, Dialog, Form, FormItem, Popover } from 'element-ui';
-import { cloneDeep } from 'lodash';
+// import { cloneDeep } from 'lodash';
+import _ from 'lodash';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
+const { cloneDeep } = _;
 export default {
   name: 'tablist',
   data() {

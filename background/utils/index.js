@@ -1,6 +1,7 @@
-import { differenceWith, concat, uniqBy } from 'lodash';
+import _ from 'lodash';
 import browser from 'webextension-polyfill';
 
+const { differenceWith, concat, uniqBy } = _;
 export const getCurrentWindow = async () => {
   const currentWindow = await browser.windows.getCurrent();
   return currentWindow.id;

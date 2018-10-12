@@ -19,6 +19,12 @@ if (!window.$Vue) {
     browser.storage.local.get('tabstore').then((items) => {
       if (items.tabstore) {
         win.vuestore.commit('changeTabStore', items.tabstore);
+      } else {
+        win.vuestore.commit('changeTabStore', [{
+          identity: 'temptabs',
+          collapse: false,
+          list: [],
+        }]);
       }
     });
     // todo

@@ -10,7 +10,10 @@
 
 <script>
 import { Input } from 'element-ui';
-import { debounce } from 'lodash';
+// import { debounce } from 'lodash';
+import _ from 'lodash';
+
+const { debounce } = _;
 
 export default {
   name: 'todo',
@@ -22,16 +25,15 @@ export default {
   components: {
     Input,
   },
-  beforeMount() {
-    this.textarea = this.$store.state.todoVal;
-  },
   watch: {
+    '$store.state.todoVal'(val) {
+      this.textarea = val;
+    },
     textarea: debounce(function () { this.changeTodoVal(); }, 300),
-    //    throttle(function(){console.log(77)}, 100)()
-
   },
   methods: {
     changeTodoVal() {
+      console.log(this.textarea);
       this.$store.commit('changeTodoVal', this.textarea);
     },
   },

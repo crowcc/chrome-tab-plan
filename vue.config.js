@@ -6,7 +6,7 @@ module.exports = {
   configureWebpack: {
     entry: {
       index: ['./src/main.js'],
-      background: './background/background.js',
+    //   background: './background/background.js',
     },
     resolve: {
       alias: {
