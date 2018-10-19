@@ -13,12 +13,14 @@ export const openAdminPage = async (windowId) => {
   // open only one in a window
   const tabs = await getTabsByWindow(windowId);
   const tabListsUrl = browser.runtime.getURL('index.html#/');
-  const urls = tabs.map(item => item.url);
-  if (urls.indexOf(tabListsUrl) < 0) {
+  console.log(tabListsUrl);
+  //   const urls = tabs.map(item => item.url);
+  const results = tabs.filter(item => item.url.indexOf(tabListsUrl) > -1);
+  if (!results.length) {
     await browser.tabs.create({ url: tabListsUrl, windowId });
   } else {
-    const currentAdminTab = tabs[urls.indexOf(tabListsUrl)];
-    browser.tabs.highlight({ tabs: currentAdminTab.index, windowId: currentAdminTab.windowId });
+    // const currentAdminTab = tabs[urls.indexOf(tabListsUrl)];
+    browser.tabs.highlight({ tabs: results[0].index, windowId: results[0].windowId });
   }
 };
 
@@ -49,7 +51,7 @@ export const saveAllCurrentWIndowTabs = async (tab) => {
   }
   const tabs = await getTabsByWindow(windowId);
   const normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
-  saveTabs(normalTbas, windowId);
+  saveTabs(uniqBy(normalTbas, 'url'), windowId);
 };
 
 export const saveAllWIndowTabs = async (tab) => {
