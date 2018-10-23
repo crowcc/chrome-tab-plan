@@ -1,5 +1,5 @@
 <template>
-  <div class="tablist">
+  <div class="tablist" v-if='showList'>
     <Card class="box-card">
       <div slot="header" class="clearfix">
         <Input v-show="editingTitle" ref="titleInput" v-model="titleVal" placeholder="请输入标题" @blur="saveTitle" @keyup.enter.native="saveTitle" />
@@ -16,8 +16,8 @@
         </div>
       </div>
       <CollapseTransition>
-        <Draggable v-show='!blockItem.collapse' class='tab-list' v-model="tablist" :options="{group:'tab-item'}">
-          <div v-for="(element,index) in tablist" :key="element.url" class='tab-item'>
+        <Draggable v-show="!blockItem.collapse||filterVal!==''" class='tab-list' v-model="tablist" :options="{group:'tab-item'}">
+          <div v-for="(element,index) in tablist" v-if="filterVal===''||element.title.toLowerCase().indexOf(filterVal.toLowerCase())>-1" :key="element.url" class='tab-item'>
             <div class='tab-title' @click='()=>openTabPage(element)'>{{element.title}}</div>
             <div class='tab-action'>
               <Popover
@@ -85,6 +85,7 @@ export default {
       titleVal: '',
       editingTitle: false,
       editTabVisible: false,
+      showList: true,
       tabForm: {
         title: '',
         url: '',
@@ -125,6 +126,25 @@ export default {
       type: Number,
       default: -1,
     },
+    filterVal: {
+      type: String,
+      default: '',
+    },
+  },
+  watch: {
+    filterVal(filterVal) {
+      if (filterVal !== '') {
+        const filterResult = this.blockItem.list.filter(item => (item.title).toLowerCase().indexOf(filterVal.toLowerCase()) > -1);
+        if (filterResult.length) {
+          this.showList = true;
+        } else {
+          this.showList = false;
+        }
+      } else {
+        this.showList = true;
+      }
+    },
+
   },
   components: {
     Draggable,

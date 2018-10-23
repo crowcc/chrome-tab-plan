@@ -15,11 +15,13 @@
     "todo"
   ],
   "dependencies": {
+    "axios": "^0.18.0",
     "element-ui": "^2.4.8",
     "lodash": "^4.17.11",
     "register-service-worker": "^1.0.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
+    "vue2-editor": "^2.6.6",
     "vuedraggable": "^2.16.0",
     "vuex": "^3.0.1",
     "webextension-polyfill": "^0.3.1"

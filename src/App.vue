@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div v-if='$store.state.inited' id="nav">
       <router-link to="/">Tabs Home</router-link> |
       <router-link to="/todo">Todo</router-link>
     </div>
@@ -15,9 +15,10 @@
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   font-size: 14px;
+  padding: 30px;
 }
 #nav {
-  padding: 30px;
+    margin-bottom: 20px;
   a {
     font-weight: bold;
     color: #2c3e50;

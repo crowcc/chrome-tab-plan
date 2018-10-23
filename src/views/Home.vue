@@ -4,13 +4,17 @@
     <Button @click='newlist'>new list</Button>
     <Button @click='exportTab'>export</Button>
     <Button class="import-new">import
-      <input id="file" class="import-old" @change="importFile" type="file" accept="application/json">
+      <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
     </Button>
     <!-- <Button @click='debugStorage'>debug</Button> -->
-    <Tablist class="tab-card" :blockItem="tabstore[0]" :changelist='(key,val)=>changeTabBlock(key,val,0)' :deleteTabList='()=>deleteTabList(0)' isStatic></Tablist>
+    <Input
+      class='filter-input'
+      placeholder="搜索"
+      v-model="filterVal" />
+    <Tablist class="tab-card" :filterVal="filterVal" :blockItem="tabstore[0]" :changelist='(key,val)=>changeTabBlock(key,val,0)' :deleteTabList='()=>deleteTabList(0)' isStatic></Tablist>
     <Draggable  v-model="tabstore" :options="{group:'tabstore'}">
       <template v-for="(value, index) in tabstore" >
-        <Tablist v-if='index!==0' class='tab-group tab-card' :key="index" :blockIndex='index' :blockItem="value" :changelist='(key,val)=>changeTabBlock(key,val,index)' :deleteTabList='()=>deleteTabList(index)'></Tablist>
+        <Tablist v-if='index!==0' class='tab-group tab-card' :filterVal="filterVal" :key="index" :blockIndex='index' :blockItem="value" :changelist='(key,val)=>changeTabBlock(key,val,index)' :deleteTabList='()=>deleteTabList(index)'></Tablist>
       </template>
     </Draggable>
   </div>
@@ -20,15 +24,21 @@
 import Draggable from 'vuedraggable';
 import browser from 'webextension-polyfill';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
-import { Button } from 'element-ui';
+import { Button, Input } from 'element-ui';
 import Tablist from './tablist';
 
 export default {
   name: 'home',
+  data() {
+    return {
+      filterVal: '',
+    };
+  },
   components: {
     Draggable,
     Tablist,
     Button,
+    Input,
   },
   computed: {
     tabstore: {
@@ -59,9 +69,9 @@ export default {
     },
     exportTab() {
       const tabsObj = {
-        temptabs: this.$store.state.temptabs,
         tabstore: this.$store.state.tabstore,
         todoVal: this.$store.state.todoVal,
+        todoTodayVal: this.$store.state.todoTodayVal,
       };
       this.download('tabs-plan.json', JSON.stringify(tabsObj));
     },
@@ -82,9 +92,9 @@ export default {
     },
     onReaderLoad(event) {
       const obj = JSON.parse(event.target.result);
-      //   this.$store.commit('changeTemp', { val: obj.temptabs });
       this.$store.commit('changeTabStore', obj.tabstore);
       this.$store.commit('changeTodoVal', obj.todoVal);
+      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
     },
     async debugStorage() {
       //   browser.storage.local.clear();
@@ -108,6 +118,9 @@ export default {
   opacity: 0;
   height: 100%;
   width: 100%;
+}
+.filter-input{
+    margin-top:20px;
 }
 </style>
 
