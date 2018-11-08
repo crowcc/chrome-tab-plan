@@ -13,6 +13,7 @@ const debug = process.env.NODE_ENV !== 'production';
 
 const state = {
   inited: false,
+  token: '',
   tabstore: [{
     identity: 'temptabs',
     collapse: false,
@@ -27,6 +28,11 @@ const mutations = {
     state.inited = payload;
     inited = payload;
   },
+  changeToken(state, payload) {
+    state.token = payload;
+    syncLocalStorage({ token: payload });
+  },
+
   changeTodoTodayVal(state, payload) {
     state.todoTodayVal = payload;
     syncLocalStorage({ todoTodayVal: payload });

@@ -2,11 +2,14 @@
   <div class="home">
     <Button @click='savetabs'>save all in this window</Button>
     <Button @click='newlist'>new list</Button>
-    <Button @click='exportTab'>export</Button>
+    <!-- <Button @click='exportTab'>export</Button>
     <Button class="import-new">import
       <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
-    </Button>
-    <!-- <Button @click='debugStorage'>debug</Button> -->
+    </Button> -->
+    <Button @click='()=>{uploading=true;uploadToDropbox()}' :loading="uploading" :style="{width:'100px'}">upload</Button>
+    <!-- <Button @click='downloadDropbox'>download</Button> -->
+    <Button @click='asyncDropbox' :loading="asyncing" :style="{width:'100px'}">async</Button>
+    <!-- <Button @click='debug'>debug</Button> -->
     <Input
       class='filter-input'
       placeholder="搜索"
@@ -23,15 +26,22 @@
 <script>
 import Draggable from 'vuedraggable';
 import browser from 'webextension-polyfill';
+import { Dropbox } from 'dropbox';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
 import { Button, Input } from 'element-ui';
 import Tablist from './tablist';
+
+let dbx;
+let usrMail = '';
+const CLIENT_ID = 'sthrhiwr4d6qyfw';
 
 export default {
   name: 'home',
   data() {
     return {
       filterVal: '',
+      asyncing: false,
+      uploading: false,
     };
   },
   components: {
@@ -50,6 +60,9 @@ export default {
       },
     },
   },
+  mounted() {
+    browser.identity.getProfileUserInfo((info) => { usrMail = info.email; });
+  },
   methods: {
     savetabs() {
       saveAllCurrentWIndowTabs();
@@ -67,13 +80,20 @@ export default {
     deleteTabList(index) {
       this.$store.commit('deleteTabList', index);
     },
-    exportTab() {
-      const tabsObj = {
+    getTabsObj() {
+      return {
         tabstore: this.$store.state.tabstore,
         todoVal: this.$store.state.todoVal,
         todoTodayVal: this.$store.state.todoTodayVal,
       };
-      this.download('tabs-plan.json', JSON.stringify(tabsObj));
+    },
+    importTabsObj(obj) {
+      this.$store.commit('changeTabStore', obj.tabstore);
+      this.$store.commit('changeTodoVal', obj.todoVal);
+      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
+    },
+    exportTab() {
+      this.download('tabs-plan.json', JSON.stringify(this.getTabsObj()));
     },
     download(filename, content, contentType) {
       if (!contentType) contentType = 'application/octet-stream';
@@ -92,12 +112,56 @@ export default {
     },
     onReaderLoad(event) {
       const obj = JSON.parse(event.target.result);
-      this.$store.commit('changeTabStore', obj.tabstore);
-      this.$store.commit('changeTodoVal', obj.todoVal);
-      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
+      this.importTabsObj(obj);
+    },
+    asyncDropbox() {
+      this.asyncing = true;
+      const token = this.$store.state.token;
+      if (token) {
+        dbx = new Dropbox({ accessToken: token });
+      }
+      this.downloadDropbox();
+    },
+    uploadToDropbox(obj) {
+      if (!dbx) {
+        dbx = new Dropbox({ accessToken: this.$store.state.token });
+      }
+      dbx.filesUpload({
+        contents: JSON.stringify(obj || this.getTabsObj()),
+        path: `/${usrMail}.json`,
+        mode: 'overwrite',
+        autorename: true,
+        mute: true,
+        strict_conflict: false,
+      }).then(() => { this.asyncing = false; this.uploading = false; }).catch(() => { this.getToken(); });
+    },
+    getToken() {
+      this.asyncing = false;
+      this.uploading = false;
+      dbx = new Dropbox({ clientId: CLIENT_ID });
+      const authUrl = dbx.getAuthenticationUrl('https://crowcc.buttercup.com');
+      window.open(authUrl);
+    },
+    downloadDropbox() {
+      dbx.filesDownload({
+        path: `/${usrMail}.json`,
+      }).then((e) => {
+        const blob = e.fileBlob;
+        const reader = new FileReader();
+        reader.addEventListener('loadend', () => {
+          const obj = JSON.parse(reader.result);
+          // diff预定
+          this.importTabsObj(obj);
+          this.uploadToDropbox(obj);
+        });
+        reader.readAsText(blob);
+      }).catch(() => { this.getToken(); });
+    },
+    debug() {
+      console.log(this.$store.state);
     },
     async debugStorage() {
-      //   browser.storage.local.clear();
+      browser.storage.local.clear();
       const localData = await browser.storage.local.get();
       console.log(localData);
     },

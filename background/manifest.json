@@ -25,7 +25,10 @@
     "tabs",
     "history",
     "identity",
-    "notifications"
+    "notifications",
+    "identity",
+    "identity.email",
+    "declarativeContent"
   ],
   "background": {
     "scripts": ["background.js"],

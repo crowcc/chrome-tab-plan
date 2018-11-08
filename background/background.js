@@ -26,6 +26,19 @@ const init = async () => {
     browser.browserAction.onClicked.addListener(async (tab) => {
       openAdminPage(tab.windowId);
     });
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (tab.url.indexOf('buttercup.com') > 0) {
+        tab.url.split('#')[1].split('&').forEach((item) => {
+          if (item.split('=')[0] === 'access_token') {
+            browser.runtime.getBackgroundPage().then((win) => {
+              win.vuestore.commit('changeToken', item.split('=')[1]);
+              openAdminPage(tab.windowId);
+              browser.tabs.remove(tabId);
+            });
+          }
+        });
+      }
+    });
   }
 };
 init();

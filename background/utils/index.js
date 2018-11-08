@@ -13,7 +13,6 @@ export const openAdminPage = async (windowId) => {
   // open only one in a window
   const tabs = await getTabsByWindow(windowId);
   const tabListsUrl = browser.runtime.getURL('index.html#/');
-  console.log(tabListsUrl);
   //   const urls = tabs.map(item => item.url);
   const results = tabs.filter(item => item.url.indexOf(tabListsUrl) > -1);
   if (!results.length) {
