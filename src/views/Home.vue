@@ -9,6 +9,7 @@
     <Button @click='()=>{uploading=true;uploadToDropbox()}' :loading="uploading" :style="{width:'100px'}">upload</Button>
     <!-- <Button @click='downloadDropbox'>download</Button> -->
     <Button @click='asyncDropbox' :loading="asyncing" :style="{width:'100px'}">async</Button>
+    <Button @click='resetDropbox' :loading="asyncing" :style="{width:'100px'}">reset dropbox</Button>
     <!-- <Button @click='debug'>debug</Button> -->
     <Input
       class='filter-input'
@@ -63,6 +64,11 @@ export default {
   mounted() {
     browser.identity.getProfileUserInfo((info) => { usrMail = info.email; });
   },
+  watch: {
+    '$store.state.token'() {
+      dbx = new Dropbox({ accessToken: this.$store.state.token });
+    },
+  },
   methods: {
     savetabs() {
       saveAllCurrentWIndowTabs();
@@ -116,9 +122,8 @@ export default {
     },
     asyncDropbox() {
       this.asyncing = true;
-      const token = this.$store.state.token;
-      if (token) {
-        dbx = new Dropbox({ accessToken: token });
+      if (!dbx) {
+        dbx = new Dropbox({ accessToken: this.$store.state.token });
       }
       this.downloadDropbox();
     },
@@ -157,10 +162,12 @@ export default {
         reader.readAsText(blob);
       }).catch(() => { this.getToken(); });
     },
-    debug() {
-      console.log(this.$store.state);
+    resetDropbox() {
+      this.$store.commit('changeToken', '');
+      this.getToken();
     },
     async debugStorage() {
+      console.log(this.$store.state);
       browser.storage.local.clear();
       const localData = await browser.storage.local.get();
       console.log(localData);
