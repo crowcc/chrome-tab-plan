@@ -9,7 +9,7 @@
     <Button @click='()=>{uploading=true;uploadToDropbox()}' :loading="uploading" :style="{width:'100px'}">upload</Button>
     <!-- <Button @click='downloadDropbox'>download</Button> -->
     <Button @click='asyncDropbox' :loading="asyncing" :style="{width:'100px'}">async</Button>
-    <Button @click='resetDropbox' :loading="asyncing" :style="{width:'100px'}">reset dropbox</Button>
+    <Button @click='resetDropbox'>reset dropbox</Button>
     <!-- <Button @click='debug'>debug</Button> -->
     <Input
       class='filter-input'
