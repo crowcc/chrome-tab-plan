@@ -65,8 +65,10 @@ export default {
     browser.identity.getProfileUserInfo((info) => { usrMail = info.email; });
   },
   watch: {
-    '$store.state.token'() {
-      dbx = new Dropbox({ accessToken: this.$store.state.token });
+    '$store.state.token'(val) {
+      if (val) {
+        dbx = new Dropbox({ accessToken: val });
+      }
     },
   },
   methods: {
@@ -122,15 +124,11 @@ export default {
     },
     asyncDropbox() {
       this.asyncing = true;
-      if (!dbx) {
-        dbx = new Dropbox({ accessToken: this.$store.state.token });
-      }
+      this.getToken();
       this.downloadDropbox();
     },
     uploadToDropbox(obj) {
-      if (!dbx) {
-        dbx = new Dropbox({ accessToken: this.$store.state.token });
-      }
+      this.getToken();
       dbx.filesUpload({
         contents: JSON.stringify(obj || this.getTabsObj()),
         path: `/${usrMail}.json`,
@@ -138,14 +136,16 @@ export default {
         autorename: true,
         mute: true,
         strict_conflict: false,
-      }).then(() => { this.asyncing = false; this.uploading = false; }).catch(() => { this.getToken(); });
+      }).then(() => { this.asyncing = false; this.uploading = false; }).catch(() => { this.resetDropbox(); });
     },
     getToken() {
-      this.asyncing = false;
-      this.uploading = false;
-      dbx = new Dropbox({ clientId: CLIENT_ID });
-      const authUrl = dbx.getAuthenticationUrl('https://crowcc.buttercup.com');
-      window.open(authUrl);
+      if (!dbx) {
+        if (this.$store.state.token) {
+          dbx = new Dropbox({ accessToken: this.$store.state.token });
+        } else {
+          this.resetDropbox();
+        }
+      }
     },
     downloadDropbox() {
       dbx.filesDownload({
@@ -160,11 +160,15 @@ export default {
           this.uploadToDropbox(obj);
         });
         reader.readAsText(blob);
-      }).catch(() => { this.getToken(); });
+      }).catch(() => { this.resetDropbox(); });
     },
     resetDropbox() {
       this.$store.commit('changeToken', '');
-      this.getToken();
+      this.asyncing = false;
+      this.uploading = false;
+      dbx = new Dropbox({ clientId: CLIENT_ID });
+      const authUrl = dbx.getAuthenticationUrl('https://crowcc.buttercup.com');
+      window.open(authUrl);
     },
     async debugStorage() {
       console.log(this.$store.state);
@@ -190,8 +194,8 @@ export default {
   height: 100%;
   width: 100%;
 }
-.filter-input{
-    margin-top:20px;
+.filter-input {
+  margin-top: 20px;
 }
 </style>
 
