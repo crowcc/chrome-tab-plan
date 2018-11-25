@@ -28,11 +28,6 @@ const mutations = {
     state.inited = payload;
     inited = payload;
   },
-  changeToken(state, payload) {
-    state.token = payload;
-    syncLocalStorage({ token: payload });
-  },
-
   changeTodoTodayVal(state, payload) {
     state.todoTodayVal = payload;
     syncLocalStorage({ todoTodayVal: payload });

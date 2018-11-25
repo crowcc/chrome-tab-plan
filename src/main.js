@@ -32,11 +32,7 @@ if (!window.init) {
     const b = browser.storage.local.get('todoTodayVal').then((items) => {
       win.vuestore.commit('changeTodoTodayVal', items.todoTodayVal);
     });
-    // token
-    const to = browser.storage.local.get('token').then((items) => {
-      win.vuestore.commit('changeToken', items.token);
-    });
-    Promise.all([t, a, b, to]).then(() => {
+    Promise.all([t, a, b]).then(() => {
       win.vuestore.commit('inited', true);
       new Vue({
         router,

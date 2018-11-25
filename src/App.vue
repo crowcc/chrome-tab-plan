@@ -1,13 +1,177 @@
 <template>
   <div id="app">
     <div v-if='$store.state.inited' id="nav">
-      <router-link to="/">Tabs Home</router-link> |
-      <router-link to="/todo">Todo</router-link>
+      <div>
+        <router-link to="/">Tabs Home</router-link> |
+        <router-link to="/todo">Todo</router-link>
+      </div>
+      <div>
+        <!-- <Button size="mini" type="text" @click='exportTab'>export</Button>
+        <Button size="mini" type="text" class="import-new">import
+          <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
+        </Button> -->
+        <Button size="mini" type="text"  @click='syncUpload' :loading="uploading" :style="{width:'50px'}">push</Button>
+        <Button size="mini" type="text" @click='syncDownload' :loading="downloading" :style="{width:'50px'}">pull</Button>
+        <Button size="mini" type="text" @click='editToken'>change token</Button>
+        <Input :style="{width:'200px',marginLeft:'10px'}" v-show="changeTokenV" ref="gitTokenRef" v-model="gitToken" focus size='mini' @blur="saveGitToken" @keyup.enter.native="saveGitToken" />
+      </div>
+
     </div>
     <router-view/>
   </div>
 </template>
+<script>
+import { Button, Input, Message } from 'element-ui';
+import browser from 'webextension-polyfill';
 
+let description = 'tabs plan sync data';
+
+export default {
+  name: 'home',
+  data() {
+    return {
+      uploading: false,
+      downloading: false,
+      changeTokenV: false,
+      gitToken: undefined,
+    };
+  },
+  components: {
+    Button,
+    Input,
+  },
+  mounted() {
+    browser.identity.getProfileUserInfo((info) => { description = `tabs plan sync data for ${info.email}`; });
+
+    browser.storage.local.get('gitToken').then((d) => {
+      this.gitToken = d.gitToken;
+    });
+  },
+  methods: {
+    editToken() {
+      this.changeTokenV = true;
+      this.$nextTick(() => {
+        this.$refs.gitTokenRef.focus();
+      });
+    },
+    getTabsObj() {
+      return {
+        tabstore: this.$store.state.tabstore,
+        todoVal: this.$store.state.todoVal,
+        todoTodayVal: this.$store.state.todoTodayVal,
+      };
+    },
+    importTabsObj(obj) {
+      this.$store.commit('changeTabStore', obj.tabstore);
+      this.$store.commit('changeTodoVal', obj.todoVal);
+      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
+    },
+    exportTab() {
+      this.download('tabs-plan.json', JSON.stringify(this.getTabsObj()));
+    },
+    download(filename, content, contentType) {
+      if (!contentType) contentType = 'application/octet-stream';
+      const a = document.createElement('a');
+      const blob = new Blob([content], {
+        type: contentType,
+      });
+      a.href = window.URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    },
+    importFile(event) {
+      const reader = new FileReader();
+      reader.onload = this.onReaderLoad;
+      reader.readAsText(event.target.files[0]);
+    },
+    onReaderLoad(event) {
+      const obj = JSON.parse(event.target.result);
+      this.importTabsObj(obj);
+    },
+    async initSync() {
+      if (!this.gitToken) {
+        Message.error('请先录入git token');
+        this.downloading = false;
+        this.uploading = false;
+        return;
+      }
+      return this.axios({
+        method: 'GET',
+        url: 'https://api.github.com/gists',
+        headers: { Authorization: `Bearer ${this.gitToken}` },
+      }).then((response) => {
+        const syncdata = response.data.filter(item => item.description === description);
+        if (syncdata.length) {
+          return syncdata[0];
+        }
+        return this.axios({
+          method: 'POST',
+          url: 'https://api.github.com/gists',
+          headers: { Authorization: `Bearer ${this.gitToken}` },
+          data: {
+            description,
+            public: false,
+            files: {
+              tabsplan: {
+                content: JSON.stringify(this.getTabsObj()),
+              },
+            },
+          },
+        }).then(() => { this.downloading = false; this.uploading = false; });
+      }).catch(() => {
+        Message.error('无效token');
+        this.downloading = false;
+        this.uploading = false;
+      });
+    },
+    async syncUpload() {
+      this.uploading = true;
+      const syncdata = await this.initSync();
+      if (syncdata.id) {
+        this.axios({
+          method: 'PATCH',
+          url: `https://api.github.com/gists/${syncdata.id}`,
+          headers: { Authorization: `Bearer ${this.gitToken}` },
+          data: {
+            files: {
+              tabsplan: {
+                content: JSON.stringify(this.getTabsObj()),
+              },
+            },
+          },
+        }).then(() => { this.uploading = false; });
+      }
+    },
+    async syncDownload() {
+      this.downloading = true;
+      const syncdata = await this.initSync();
+      if (syncdata === 'OK') {
+        return;
+      }
+      if (syncdata.id) {
+        this.axios({
+          method: 'GET',
+          url: `https://api.github.com/gists/${syncdata.id}`,
+          headers: { Authorization: `Bearer ${this.gitToken}` },
+        }).then((response) => {
+          this.asyncing = false; this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
+          this.downloading = false;
+        });
+      }
+    },
+    saveGitToken() {
+      this.changeTokenV = false;
+      browser.storage.local.set({ gitToken: this.gitToken });
+    },
+    async debugStorage() {
+      console.log(this.$store.state);
+      browser.storage.local.clear();
+      const localData = await browser.storage.local.get();
+      console.log(localData);
+    },
+  },
+};
+</script>
 <style lang="scss">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -18,6 +182,9 @@
   padding: 30px;
 }
 #nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
   a {
     font-weight: bold;
@@ -26,5 +193,19 @@
       color: #409eff;
     }
   }
+}
+
+</style>
+<style lang="scss" scoped>
+.import-new {
+  position: relative;
+}
+.import-old {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  height: 100%;
+  width: 100%;
 }
 </style>

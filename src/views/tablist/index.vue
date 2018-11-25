@@ -73,7 +73,6 @@
 <script>
 import Draggable from 'vuedraggable';
 import { Input, Button, Card, Dialog, Form, FormItem, Popover } from 'element-ui';
-// import { cloneDeep } from 'lodash';
 import _ from 'lodash';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
@@ -226,7 +225,7 @@ export default {
     moveToBlock(index, bindex) {
       const newBlockItemList = cloneDeep(this.blockItem.list);
       const moveitem = newBlockItemList.splice(index, 1);
-      console.log(moveitem[0]);
+
       this.changelist('list', newBlockItemList);
       const moveTolist = cloneDeep(this.$store.state.tabstore[bindex].list);
       moveTolist.unshift(moveitem[0]);

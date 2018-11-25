@@ -1,16 +1,7 @@
 <template>
   <div class="home">
-    <Button @click='savetabs'>save all in this window</Button>
-    <Button @click='newlist'>new list</Button>
-    <!-- <Button @click='exportTab'>export</Button>
-    <Button class="import-new">import
-      <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
-    </Button> -->
-    <Button @click='()=>{uploading=true;uploadToDropbox()}' :loading="uploading" :style="{width:'100px'}">upload</Button>
-    <!-- <Button @click='downloadDropbox'>download</Button> -->
-    <Button @click='asyncDropbox' :loading="asyncing" :style="{width:'100px'}">async</Button>
-    <Button @click='resetDropbox'>reset dropbox</Button>
-    <!-- <Button @click='debug'>debug</Button> -->
+    <Button @click='savetabs' size="mini" round>save all in this window</Button>
+    <Button @click='newlist' size="mini" round>new list</Button>
     <Input
       class='filter-input'
       placeholder="搜索"
@@ -26,23 +17,17 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import browser from 'webextension-polyfill';
-import { Dropbox } from 'dropbox';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
 import { Button, Input } from 'element-ui';
 import Tablist from './tablist';
-
-let dbx;
-let usrMail = '';
-const CLIENT_ID = 'sthrhiwr4d6qyfw';
 
 export default {
   name: 'home',
   data() {
     return {
       filterVal: '',
-      asyncing: false,
       uploading: false,
+      downloading: false,
     };
   },
   components: {
@@ -59,16 +44,6 @@ export default {
       set(value) {
         this.$store.commit('changeTabStore', value);
       },
-    },
-  },
-  mounted() {
-    browser.identity.getProfileUserInfo((info) => { usrMail = info.email; });
-  },
-  watch: {
-    '$store.state.token'(val) {
-      if (val) {
-        dbx = new Dropbox({ accessToken: val });
-      }
     },
   },
   methods: {
@@ -88,111 +63,18 @@ export default {
     deleteTabList(index) {
       this.$store.commit('deleteTabList', index);
     },
-    getTabsObj() {
-      return {
-        tabstore: this.$store.state.tabstore,
-        todoVal: this.$store.state.todoVal,
-        todoTodayVal: this.$store.state.todoTodayVal,
-      };
-    },
-    importTabsObj(obj) {
-      this.$store.commit('changeTabStore', obj.tabstore);
-      this.$store.commit('changeTodoVal', obj.todoVal);
-      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
-    },
-    exportTab() {
-      this.download('tabs-plan.json', JSON.stringify(this.getTabsObj()));
-    },
-    download(filename, content, contentType) {
-      if (!contentType) contentType = 'application/octet-stream';
-      const a = document.createElement('a');
-      const blob = new Blob([content], {
-        type: contentType,
-      });
-      a.href = window.URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-    },
-    importFile(event) {
-      const reader = new FileReader();
-      reader.onload = this.onReaderLoad;
-      reader.readAsText(event.target.files[0]);
-    },
-    onReaderLoad(event) {
-      const obj = JSON.parse(event.target.result);
-      this.importTabsObj(obj);
-    },
-    asyncDropbox() {
-      this.asyncing = true;
-      this.getToken();
-      this.downloadDropbox();
-    },
-    uploadToDropbox(obj) {
-      this.getToken();
-      dbx.filesUpload({
-        contents: JSON.stringify(obj || this.getTabsObj()),
-        path: `/${usrMail}.json`,
-        mode: 'overwrite',
-        autorename: true,
-        mute: true,
-        strict_conflict: false,
-      }).then(() => { this.asyncing = false; this.uploading = false; }).catch(() => { this.resetDropbox(); });
-    },
-    getToken() {
-      if (!dbx) {
-        if (this.$store.state.token) {
-          dbx = new Dropbox({ accessToken: this.$store.state.token });
-        } else {
-          this.resetDropbox();
-        }
-      }
-    },
-    downloadDropbox() {
-      dbx.filesDownload({
-        path: `/${usrMail}.json`,
-      }).then((e) => {
-        const blob = e.fileBlob;
-        const reader = new FileReader();
-        reader.addEventListener('loadend', () => {
-          const obj = JSON.parse(reader.result);
-          // diff预定
-          this.importTabsObj(obj);
-          this.uploadToDropbox(obj);
-        });
-        reader.readAsText(blob);
-      }).catch(() => { this.resetDropbox(); });
-    },
-    resetDropbox() {
-      this.$store.commit('changeToken', '');
-      this.asyncing = false;
-      this.uploading = false;
-      dbx = new Dropbox({ clientId: CLIENT_ID });
-      const authUrl = dbx.getAuthenticationUrl('https://crowcc.buttercup.com');
-      window.open(authUrl);
-    },
-    async debugStorage() {
-      console.log(this.$store.state);
-      browser.storage.local.clear();
-      const localData = await browser.storage.local.get();
-      console.log(localData);
-    },
+    // async debugStorage() {
+    //   console.log(this.$store.state);
+    //   browser.storage.local.clear();
+    //   const localData = await browser.storage.local.get();
+    //   console.log(localData);
+    // },
   },
 };
 </script>
 <style lang="scss" scoped>
 .tab-card {
   margin: 20px 0;
-}
-.import-new {
-  position: relative;
-}
-.import-old {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  height: 100%;
-  width: 100%;
 }
 .filter-input {
   margin-top: 20px;
