@@ -15,7 +15,6 @@
         <Button size="mini" type="text" @click='editToken'>change token</Button>
         <Input :style="{width:'200px',marginLeft:'10px'}" v-show="changeTokenV" ref="gitTokenRef" v-model="gitToken" focus size='mini' @blur="saveGitToken" @keyup.enter.native="saveGitToken" />
       </div>
-
     </div>
     <router-view/>
   </div>

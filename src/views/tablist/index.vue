@@ -1,45 +1,93 @@
 <template>
-  <div class="tablist" v-if='showList'>
-    <Card class="box-card">
-      <div slot="header" class="clearfix">
-        <Input v-show="editingTitle" ref="titleInput" v-model="titleVal" placeholder="请输入标题" @blur="saveTitle" @keyup.enter.native="saveTitle" />
-        <div v-show="!editingTitle" class='title-line'>
-          <div class='block-title-line' @click="collapseTabs">
-            <i  :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
-            <div class="block-title-name" @click="editTitle">{{blockItem.title||'临时'}}</div>
-          </div>
-          <div class='tab-action'>
-            <Button round size="small" @click="openAll">Open</Button>
-            <Button v-if="!isStatic" size="small" type="warning" icon="el-icon-edit" circle @click="editTitle"></Button>
-            <Button size="small" type="danger" icon="el-icon-delete" circle  @click="deleteTabList"></Button>
-          </div>
-        </div>
-      </div>
-      <CollapseTransition>
-        <Draggable v-show="!blockItem.collapse||filterVal!==''" class='tab-list' v-model="tablist" :options="{group:'tab-item'}">
-          <div v-for="(element,index) in tablist" v-if="filterVal===''||element.title.toLowerCase().indexOf(filterVal.toLowerCase())>-1" :key="element.url" class='tab-item'>
-            <div class='tab-title' @click='()=>openTabPage(element)'>{{element.title}}</div>
-            <div class='tab-action'>
-              <Popover
-                placement="left"
-                width="200"
-                class="action-btn"
-                trigger="hover">
-                <div v-if='!isStatic' class='tab-block-item' @click='()=>moveToBlock(index,0)'>临时</div>
-                <template v-for="(value,bindex) in $store.state.tabstore">
-                  <div class='tab-block-item' :key='bindex' v-if='blockIndex!==bindex' @click='()=>moveToBlock(index,bindex)'>{{value.title}}</div>
-                </template>
-                <Button slot="reference" size="small" type="primary" icon="el-icon-sort" circle @click="editTitle"></Button>
-              </Popover>
-              <Button size="small" type="warning" icon="el-icon-edit" circle @click="()=>startEditTab(element,index)"></Button>
-              <Button size="small" type="danger" icon="el-icon-delete" circle @click="()=>deleteTab(index)"></Button>
+  <div>
+    <div v-if="showTitleOnly" @click="scrollToView" class="tab-nav-item">
+      <Draggable class="drag-group" :id="`drag-group${blockIndex}`" v-model="tablist" :options="{group:'tab-item'}">{{blockItem.title||'临时'}}</Draggable>
+    </div>
+    <div class="tablist" v-if="!showTitleOnly&&showList">
+      <Card class="box-card" :id="blockItem.title||'临时'">
+        <div slot="header" class="clearfix">
+          <Input
+            v-show="editingTitle"
+            ref="titleInput"
+            v-model="titleVal"
+            placeholder="请输入标题"
+            @blur="saveTitle"
+            @keyup.enter.native="saveTitle"
+          />
+          <div v-show="!editingTitle" class="title-line">
+            <div class="block-title-line" @click="collapseTabs">
+              <i :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
+              <div class="block-title-name" @click="editTitle">{{blockItem.title||'临时'}}</div>
+            </div>
+            <div class="tab-action">
+              <Button round size="small" @click="openAll">Open</Button>
+              <Button
+                v-if="!isStatic"
+                size="small"
+                type="warning"
+                icon="el-icon-edit"
+                circle
+                @click="editTitle"
+              ></Button>
+              <Button
+                size="small"
+                type="danger"
+                icon="el-icon-delete"
+                circle
+                @click="deleteTabList"
+              ></Button>
             </div>
           </div>
-          <div class='empty-list' v-if="!tablist||!tablist.length">拖入tab以添加</div>
-        </Draggable>
-      </CollapseTransition>
-    </Card>
-    <!-- <Dialog
+        </div>
+        <CollapseTransition>
+          <Draggable
+            v-show="!blockItem.collapse||filterVal!==''"
+            class="tab-list"
+            :id="`tab-list${blockIndex}`"
+            v-model="tablist"
+            :options="{group:'tab-item'}"
+            :move="onMoveCallback"
+          >
+            <div
+              v-for="(element,index) in tablist"
+              v-if="filterVal===''||element.title.toLowerCase().indexOf(filterVal.toLowerCase())>-1"
+              :key="element.url"
+              class="tab-item"
+            >
+              <div class="tab-title" @click="()=>openTabPage(element)">{{element.title}}</div>
+              <div class="tab-action">
+                <!-- <Popover
+                  placement="left"
+                  width="200"
+                  class="action-btn"
+                  trigger="hover">
+                  <div v-if='!isStatic' class='tab-block-item' @click='()=>moveToBlock(index,0)'>临时</div>
+                  <template v-for="(value,bindex) in $store.state.tabstore">
+                    <div class='tab-block-item' :key='bindex' v-if='blockIndex!==bindex' @click='()=>moveToBlock(index,bindex)'>{{value.title}}</div>
+                  </template>
+                  <Button slot="reference" size="small" type="primary" icon="el-icon-sort" circle @click="editTitle"></Button>
+                </Popover>-->
+                <Button
+                  size="small"
+                  type="warning"
+                  icon="el-icon-edit"
+                  circle
+                  @click="()=>startEditTab(element,index)"
+                ></Button>
+                <Button
+                  size="small"
+                  type="danger"
+                  icon="el-icon-delete"
+                  circle
+                  @click="()=>deleteTab(index)"
+                ></Button>
+              </div>
+            </div>
+            <div class="empty-list" v-if="!tablist||!tablist.length">拖入tab以添加</div>
+          </Draggable>
+        </CollapseTransition>
+      </Card>
+      <!-- <Dialog
       title="新建标签组"
       :visible.sync="addTabBlockVisible">
       <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
@@ -51,28 +99,35 @@
         <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
         <Button type="primary" @click="editTab">确 定</Button>
       </span>
-    </Dialog> -->
-    <Dialog
-      title="修改标签"
-      :visible.sync="editTabVisible">
-      <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
-        <FormItem label="标签名称" prop="title">
-          <Input v-model="tabForm.title" />
-        </FormItem>
-        <FormItem label="url地址" prop="url">
-          <Input v-model="tabForm.url" />
-        </FormItem>
-      </Form>
-      <span slot="footer" class="dialog-footer">
-        <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
-        <Button type="primary" @click="editTab">确 定</Button>
-      </span>
-    </Dialog>
+      </Dialog>-->
+      <Dialog title="修改标签" :visible.sync="editTabVisible">
+        <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
+          <FormItem label="标签名称" prop="title">
+            <Input v-model="tabForm.title"/>
+          </FormItem>
+          <FormItem label="url地址" prop="url">
+            <Input v-model="tabForm.url"/>
+          </FormItem>
+        </Form>
+        <span slot="footer" class="dialog-footer">
+          <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
+          <Button type="primary" @click="editTab">确 定</Button>
+        </span>
+      </Dialog>
+    </div>
   </div>
 </template>
 <script>
 import Draggable from 'vuedraggable';
-import { Input, Button, Card, Dialog, Form, FormItem, Popover } from 'element-ui';
+import {
+  Input,
+  Button,
+  Card,
+  Dialog,
+  Form,
+  FormItem,
+  Popover,
+} from 'element-ui';
 import _ from 'lodash';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
 
@@ -90,12 +145,8 @@ export default {
         url: '',
       },
       rules: {
-        title: [
-          { required: true, message: '请输入标签名称', trigger: 'blur' },
-        ],
-        url: [
-          { required: true, message: '请输入url地址', trigger: 'blur' },
-        ],
+        title: [{ required: true, message: '请输入标签名称', trigger: 'blur' }],
+        url: [{ required: true, message: '请输入url地址', trigger: 'blur' }],
       },
       editingIndex: '',
     };
@@ -129,11 +180,15 @@ export default {
       type: String,
       default: '',
     },
+    showTitleOnly: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     filterVal(filterVal) {
       if (filterVal !== '') {
-        const filterResult = this.blockItem.list.filter(item => (item.title).toLowerCase().indexOf(filterVal.toLowerCase()) > -1);
+        const filterResult = this.blockItem.list.filter(item => item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1);
         if (filterResult.length) {
           this.showList = true;
         } else {
@@ -143,7 +198,6 @@ export default {
         this.showList = true;
       }
     },
-
   },
   components: {
     Draggable,
@@ -167,6 +221,14 @@ export default {
     },
   },
   methods: {
+    onMoveCallback(a) {
+      return a.to.id.split('drag-group')[1] !== a.from.id.split('tab-list')[1];
+    },
+    scrollToView() {
+      document
+        .querySelector(`#${this.blockItem.title || '临时'}`)
+        .scrollIntoView({ block: 'start' });
+    },
     editTitle() {
       if (this.isStatic) {
         return;
@@ -192,7 +254,10 @@ export default {
       });
     },
     openTabPage(value) {
-      if (value.url.indexOf('https://') < 0 && value.url.indexOf('http://') < 0) {
+      if (
+        value.url.indexOf('https://') < 0 &&
+        value.url.indexOf('http://') < 0
+      ) {
         window.open(`https://${value.url}`);
       } else {
         window.open(value.url);
@@ -222,23 +287,29 @@ export default {
     collapseTabs() {
       this.changelist('collapse', !this.blockItem.collapse);
     },
-    moveToBlock(index, bindex) {
-      const newBlockItemList = cloneDeep(this.blockItem.list);
-      const moveitem = newBlockItemList.splice(index, 1);
+    // moveToBlock(index, bindex) {
+    //   const newBlockItemList = cloneDeep(this.blockItem.list);
+    //   const moveitem = newBlockItemList.splice(index, 1);
 
-      this.changelist('list', newBlockItemList);
-      const moveTolist = cloneDeep(this.$store.state.tabstore[bindex].list);
-      moveTolist.unshift(moveitem[0]);
-      this.$store.commit('changeTabBlock', {
-        key: 'list',
-        val: moveTolist,
-        index: bindex,
-      });
-    },
+    //   this.changelist('list', newBlockItemList);
+    //   const moveTolist = cloneDeep(this.$store.state.tabstore[bindex].list);
+    //   moveTolist.unshift(moveitem[0]);
+    //   this.$store.commit('changeTabBlock', {
+    //     key: 'list',
+    //     val: moveTolist,
+    //     index: bindex,
+    //   });
+    // },
   },
 };
 </script>
 <style lang="scss" scoped>
+.tab-nav-item {
+  padding: 15px 10px;
+  border: 1px solid #ebeef5;
+  border-top: none;
+  cursor: pointer;
+}
 .tab-item,
 .title-line {
   text-align: left;
@@ -258,7 +329,7 @@ export default {
   padding: 5px 15px;
   &:hover {
     background-color: #ecf5ff;
-     color: #409eff;
+    color: #409eff;
     .tab-action {
       width: 130px;
     }
