@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <Button @click="savetabs" size="mini" round>save all in this window</Button>
-    <Button @click="newlist" size="mini" round>new list</Button>
+    <Button @click="savetabs" size="mini" type="primary" plain>save all in this window</Button>
+    <Button @click="newlist" size="mini" type="primary" plain>new list</Button>
     <Input class="filter-input" placeholder="搜索" v-model="filterVal"/>
     <div class="main-container">
       <div class="tabs-nav">

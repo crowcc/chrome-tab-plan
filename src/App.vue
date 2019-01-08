@@ -1,11 +1,15 @@
 <template>
   <div id="app">
     <div v-if='$store.state.inited' id="nav">
-      <div>
-        <router-link to="/">Tabs</router-link> |
-        <router-link to="/todo">Todo</router-link>
-      </div>
-      <div>
+      <Menu router mode="horizontal">
+        <MenuItem index="/">Tabs</MenuItem>
+        <MenuItem index="/Todo">Todo</MenuItem>
+      </Menu>
+      <!-- <Tabs v-model="activeNav">
+        <TabPane label="Tabs" name="/"></TabPane>
+        <TabPane label="Todo" name="/Todo"></TabPane>
+      </Tabs> -->
+      <div class="asy-action">
         <!-- <Button size="mini" type="text" @click='exportTab'>export</Button>
         <Button size="mini" type="text" class="import-new">import
           <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
@@ -15,12 +19,16 @@
         <Button size="mini" type="text" @click='editToken'>change token</Button>
         <Input :style="{width:'200px',marginLeft:'10px'}" v-show="changeTokenV" ref="gitTokenRef" v-model="gitToken" focus size='mini' @blur="saveGitToken" @keyup.enter.native="saveGitToken" />
       </div>
+      <!-- <div>
+        <router-link to="/">Tabs</router-link> |
+        <router-link to="/todo">Todo</router-link>
+      </div> -->
     </div>
     <router-view/>
   </div>
 </template>
 <script>
-import { Button, Input, Message } from 'element-ui';
+import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
 import browser from 'webextension-polyfill';
 
 let description = 'tabs plan sync data';
@@ -33,11 +41,22 @@ export default {
       downloading: false,
       changeTokenV: false,
       gitToken: undefined,
+      activeNav: '/',
     };
   },
   components: {
     Button,
+    Menu,
+    MenuItem,
     Input,
+  },
+  watch: {
+    activeNav(v) { this.$router.push({ path: v }); },
+    '$route.path'(v) {
+      if (v !== this.activeNav) {
+        this.activeNav = this.$route.path;
+      }
+    },
   },
   mounted() {
     browser.identity.getProfileUserInfo((info) => { description = `tabs plan sync data for ${info.email}`; });
@@ -172,6 +191,10 @@ export default {
 };
 </script>
 <style lang="scss">
+@import "element-variables";
+body{
+    margin:0;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -182,17 +205,7 @@ export default {
   padding-bottom: 0;
 }
 #nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #409eff;
-    }
-  }
+    position: relative;
 }
 
 </style>
@@ -207,5 +220,10 @@ export default {
   opacity: 0;
   height: 100%;
   width: 100%;
+}
+.asy-action{
+    position: absolute;
+    right:20px;
+    top:5px;
 }
 </style>

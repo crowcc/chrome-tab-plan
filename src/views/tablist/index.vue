@@ -276,6 +276,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "~ui/element-variables";
+
 .tab-nav-item {
   padding: 15px 10px;
   border: 1px solid #ebeef5;
@@ -301,8 +303,8 @@ export default {
   margin-bottom: 10px;
   padding: 5px 15px;
   &:hover {
-    background-color: #ecf5ff;
-    color: #409eff;
+    background-color: lighten($--color-primary, 50%);
+    color: $--color-primary;
     .tab-action {
       width: 130px;
     }
@@ -359,15 +361,6 @@ export default {
 }
 .action-btn {
   margin-right: 10px;
-}
-.tab-block-item {
-  line-height: 26px;
-  padding: 0 10px;
-  &:hover {
-    cursor: pointer;
-    color: #409eff;
-    background-color: #ecf5ff;
-  }
 }
 </style>
 

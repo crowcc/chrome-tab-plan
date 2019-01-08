@@ -1,7 +1,4 @@
 {
-  "showAdminPage": {
-    "message": "显示管理页面"
-  },
   "storeCurrentTab": {
     "message": "保存当前页面标签"
   },

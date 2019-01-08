@@ -1,12 +1,6 @@
-import { openAdminPage, saveCurrentTab, saveAllCurrentWIndowTabs, saveAllWIndowTabs } from '../utils';
+import { saveCurrentTab, saveAllCurrentWIndowTabs, saveAllWIndowTabs } from '../utils';
 
 export const menulist = {
-  SHOWADMINPAGE: {
-    title: 'showAdminPage',
-    action: (tab) => {
-      openAdminPage(tab.windowId);
-    },
-  },
   SAVEONE: {
     title: 'storeCurrentTab',
     action: (tab) => {
