@@ -1,10 +1,15 @@
 <template>
   <div>
     <div v-if="showTitleOnly" @click="scrollToView" class="tab-nav-item">
-      <Draggable class="drag-group" :id="`drag-group${blockIndex}`" v-model="tablist" :options="{group:'tab-item'}">{{blockItem.title||'临时'}}</Draggable>
+      <Draggable
+        class="drag-group"
+        :id="`drag-group${blockIndex}`"
+        v-model="tablist"
+        :options="{group:'tab-item'}"
+      >{{blockItem.title||'临时'}}</Draggable>
     </div>
-    <div class="tablist" v-if="!showTitleOnly&&showList">
-      <Card class="box-card" :id="blockItem.title||'临时'">
+    <div class="tablist" v-if="!showTitleOnly&&showList" :id="'blockid'+blockIndex">
+      <Card class="box-card">
         <div slot="header" class="clearfix">
           <Input
             v-show="editingTitle"
@@ -17,7 +22,10 @@
           <div v-show="!editingTitle" class="title-line">
             <div class="block-title-line" @click="collapseTabs">
               <i :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
-              <div class="block-title-name" @click="editTitle">{{blockItem.title||'临时'}}</div>
+              <div class="block-title-name">
+                <span @click="editTitle">{{blockItem.title||'临时'}}</span>
+                <span class='block-num'>{{tablist.length}}</span>
+              </div>
             </div>
             <div class="tab-action">
               <Button round size="small" @click="openAll">Open</Button>
@@ -50,23 +58,13 @@
           >
             <div
               v-for="(element,index) in tablist"
-              v-if="filterVal===''||element.title.toLowerCase().indexOf(filterVal.toLowerCase())>-1"
+              v-if="filterVal===''||element.title.toLowerCase().indexOf(filterVal.toLowerCase())>-1||element.url.toLowerCase().indexOf(filterVal.toLowerCase())>-1"
               :key="element.url"
               class="tab-item"
             >
-              <div class="tab-title" @click="()=>openTabPage(element)">{{element.title}}</div>
+              <div class="tab-title" @click="()=>openTabPage(element)">
+              <div>{{element.title}}</div><div>{{element.url}}</div></div>
               <div class="tab-action">
-                <!-- <Popover
-                  placement="left"
-                  width="200"
-                  class="action-btn"
-                  trigger="hover">
-                  <div v-if='!isStatic' class='tab-block-item' @click='()=>moveToBlock(index,0)'>临时</div>
-                  <template v-for="(value,bindex) in $store.state.tabstore">
-                    <div class='tab-block-item' :key='bindex' v-if='blockIndex!==bindex' @click='()=>moveToBlock(index,bindex)'>{{value.title}}</div>
-                  </template>
-                  <Button slot="reference" size="small" type="primary" icon="el-icon-sort" circle @click="editTitle"></Button>
-                </Popover>-->
                 <Button
                   size="small"
                   type="warning"
@@ -87,19 +85,6 @@
           </Draggable>
         </CollapseTransition>
       </Card>
-      <!-- <Dialog
-      title="新建标签组"
-      :visible.sync="addTabBlockVisible">
-      <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
-        <FormItem label="标签名称" prop="title">
-          <Input v-model="tabForm.title" />
-        </FormItem>
-      </Form>
-      <span slot="footer" class="dialog-footer">
-        <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
-        <Button type="primary" @click="editTab">确 定</Button>
-      </span>
-      </Dialog>-->
       <Dialog title="修改标签" :visible.sync="editTabVisible">
         <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
           <FormItem label="标签名称" prop="title">
@@ -188,7 +173,7 @@ export default {
   watch: {
     filterVal(filterVal) {
       if (filterVal !== '') {
-        const filterResult = this.blockItem.list.filter(item => item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1);
+        const filterResult = this.blockItem.list.filter(item => (item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 || item.url.toLowerCase().indexOf(filterVal.toLowerCase()) > -1));
         if (filterResult.length) {
           this.showList = true;
         } else {
@@ -226,7 +211,7 @@ export default {
     },
     scrollToView() {
       document
-        .querySelector(`#${this.blockItem.title || '临时'}`)
+        .querySelector(`#blockid${this.blockIndex}`)
         .scrollIntoView({ block: 'start' });
     },
     editTitle() {
@@ -287,19 +272,6 @@ export default {
     collapseTabs() {
       this.changelist('collapse', !this.blockItem.collapse);
     },
-    // moveToBlock(index, bindex) {
-    //   const newBlockItemList = cloneDeep(this.blockItem.list);
-    //   const moveitem = newBlockItemList.splice(index, 1);
-
-    //   this.changelist('list', newBlockItemList);
-    //   const moveTolist = cloneDeep(this.$store.state.tabstore[bindex].list);
-    //   moveTolist.unshift(moveitem[0]);
-    //   this.$store.commit('changeTabBlock', {
-    //     key: 'list',
-    //     val: moveTolist,
-    //     index: bindex,
-    //   });
-    // },
   },
 };
 </script>
@@ -308,6 +280,7 @@ export default {
   padding: 15px 10px;
   border: 1px solid #ebeef5;
   border-top: none;
+  border-radius: 3px;
   cursor: pointer;
 }
 .tab-item,
@@ -335,6 +308,9 @@ export default {
     }
   }
 }
+.block-num{
+    margin-left: 20px;
+}
 .title-line {
   font-weight: 600;
   height: 32px;
@@ -350,9 +326,13 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  line-height: 38px;
+  height: 38px;
   flex: auto;
   border-radius: 3px;
+  line-height: 19px;
+  &>div:nth-child(2){
+      color:#888;
+  }
 }
 .tab-action {
   flex: none;
@@ -369,6 +349,8 @@ export default {
 }
 .block-title-name {
   margin-left: 10px;
+  width: calc(100% - 200px);
+  line-height: 32px;
 }
 .empty-list {
   text-align: center;

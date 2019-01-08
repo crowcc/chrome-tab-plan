@@ -12,11 +12,7 @@
           :deleteTabList="()=>deleteTabList(0)"
           showTitleOnly
         ></Tablist>
-        <Draggable
-          v-model="tabstore"
-          :options="{group:'tabstore'}"
-          class="tabs-nav-drag"
-        >
+        <Draggable v-model="tabstore" :options="{group:'tabstore'}" class="tabs-nav-drag">
           <template v-for="(value, index) in tabstore">
             <Tablist
               v-if="index!==0"
@@ -98,7 +94,6 @@ export default {
       this.$store.commit('newTablist');
     },
     changeTabBlock(key, val, index) {
-      //   console.log(key, val, index);
       this.$store.commit('changeTabBlock', {
         key,
         val,
@@ -123,17 +118,19 @@ export default {
 }
 .tabs-list {
   flex: auto;
-  overflow: hidden;
-  margin-left: 170px;
+  overflow: auto;
+  height: calc(100vh - 210px);
+  margin-top: 20px;
+  margin-left: 20px;
 }
 .tabs-nav {
-  position: fixed;
-  top:195px;
+  flex: none;
+  margin-top: 20px;
   width: 150px;
   font-size: 12px;
   border-top: 1px solid #ebeef5;
-  border-bottom: 1px solid #ebeef5;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 210px);
+  border-radius: 3px;
   overflow: auto;
 }
 .tab-nav-item {
@@ -141,7 +138,7 @@ export default {
   padding: 15px 10px;
 }
 .tab-card {
-  margin: 20px 0;
+  margin-bottom: 20px;
 }
 .filter-input {
   margin-top: 20px;

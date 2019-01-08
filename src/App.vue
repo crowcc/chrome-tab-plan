@@ -2,7 +2,7 @@
   <div id="app">
     <div v-if='$store.state.inited' id="nav">
       <div>
-        <router-link to="/">Tabs Home</router-link> |
+        <router-link to="/">Tabs</router-link> |
         <router-link to="/todo">Todo</router-link>
       </div>
       <div>
@@ -178,7 +178,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   font-size: 14px;
-  padding: 30px;
+  padding: 20px;
+  padding-bottom: 0;
 }
 #nav {
     display: flex;
