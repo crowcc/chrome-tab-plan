@@ -6,23 +6,21 @@
         <MenuItem index="/Todo">Todo</MenuItem>
       </Menu>
       <div class="asy-action">
-        <!-- <Button size="mini" type="text" @click='exportTab'>export</Button>
+        <Button size="mini" type="text" @click='exportTab'>export</Button>
         <Button size="mini" type="text" class="import-new">import
           <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
-        </Button>-->
+        </Button>
         <Button
           size="mini"
           type="text"
           @click="syncUpload"
           :loading="uploading"
-          :style="{width:'50px'}"
         >push</Button>
         <Button
           size="mini"
           type="text"
           @click="syncDownload"
           :loading="downloading"
-          :style="{width:'50px'}"
         >pull</Button>
         <Button size="mini" type="text" @click="editToken">change token</Button>
         <Input
@@ -47,6 +45,7 @@ import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
 import browser from 'webextension-polyfill';
 
 let description = 'tabs plan sync data';
+const gistUrl = 'https://api.github.com/gists';
 
 export default {
   name: 'home',
@@ -123,7 +122,7 @@ export default {
       }
       return this.axios({
         method: 'GET',
-        url: 'https://api.github.com/gists',
+        url: gistUrl,
         headers: { Authorization: `Bearer ${this.gitToken}` },
       })
         .then((response) => {
@@ -133,7 +132,7 @@ export default {
           }
           return this.axios({
             method: 'POST',
-            url: 'https://api.github.com/gists',
+            url: gistUrl,
             headers: { Authorization: `Bearer ${this.gitToken}` },
             data: {
               description,
@@ -161,7 +160,7 @@ export default {
       if (syncdata.id) {
         this.axios({
           method: 'PATCH',
-          url: `https://api.github.com/gists/${syncdata.id}`,
+          url: `${gistUrl}/${syncdata.id}`,
           headers: { Authorization: `Bearer ${this.gitToken}` },
           data: {
             files: {
@@ -184,7 +183,7 @@ export default {
       if (syncdata.id) {
         this.axios({
           method: 'GET',
-          url: `https://api.github.com/gists/${syncdata.id}`,
+          url: `${gistUrl}/${syncdata.id}`,
           headers: { Authorization: `Bearer ${this.gitToken}` },
         }).then((response) => {
           this.asyncing = false;
@@ -207,7 +206,6 @@ export default {
 };
 </script>
 <style lang="scss">
-@import "element-variables";
 body {
   margin: 0;
 }
@@ -224,6 +222,7 @@ body {
 }
 </style>
 <style lang="scss" scoped>
+@import "~ui/element-variables";
 .import-new {
   position: relative;
 }
@@ -235,13 +234,26 @@ body {
   height: 100%;
   width: 100%;
 }
+.nav-menu{
+    background-color: lighten($--color-primary, 50%);
+    border-color:lighten($--color-primary, 30%)!important;
+}
 .asy-action {
   position: absolute;
   right: 20px;
-  top: 5px;
-  line-height: 50px;
+  top: 0;
+  line-height: 61px;
+  button{
+      min-width:50px;
+      line-height: 60px;
+      padding: 0 8px;
+
+  }
 }
 .main-container {
   padding: 20px;
+}
+.el-menu--horizontal > .el-menu-item:hover{
+background-color: lighten($--color-primary, 40%)!important;
 }
 </style>

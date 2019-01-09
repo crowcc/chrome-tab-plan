@@ -103,12 +103,6 @@ export default {
     deleteTabList(index) {
       this.$store.commit('deleteTabList', index);
     },
-    // async debugStorage() {
-    //   console.log(this.$store.state);
-    //   browser.storage.local.clear();
-    //   const localData = await browser.storage.local.get();
-    //   console.log(localData);
-    // },
   },
 };
 </script>
@@ -133,10 +127,6 @@ export default {
   border-radius: 3px;
   overflow: auto;
   font-weight: 600;
-}
-.tab-nav-item {
-  border: 1px solid #ebeef5;
-  padding: 15px 10px;
 }
 .tab-card {
   margin-bottom: 20px;

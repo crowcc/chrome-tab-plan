@@ -3,6 +3,7 @@
     <div v-if="showTitleOnly" @click="scrollToView" class="tab-nav-item">
       <Draggable
         class="drag-group"
+        :data-index="blockIndex"
         :id="`drag-group${blockIndex}`"
         v-model="tablist"
         :options="{group:'tab-item'}"
@@ -52,6 +53,7 @@
             v-show="!blockItem.collapse||filterVal!==''"
             class="tab-list"
             :id="`tab-list${blockIndex}`"
+            :data-index="blockIndex"
             v-model="tablist"
             :options="{group:'tab-item'}"
             :move="onMoveCallback"
@@ -207,6 +209,7 @@ export default {
   },
   methods: {
     onMoveCallback(a) {
+      //   return a.to.dataset.index !== a.from.dataset.index;
       return a.to.id.split('drag-group')[1] !== a.from.id.split('tab-list')[1];
     },
     scrollToView() {
@@ -279,10 +282,9 @@ export default {
 @import "~ui/element-variables";
 
 .tab-nav-item {
-  padding: 15px 10px;
+  padding: 10px;
   border: 1px solid #ebeef5;
   border-top: none;
-  border-radius: 3px;
   cursor: pointer;
 }
 .tab-item,

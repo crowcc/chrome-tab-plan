@@ -60,9 +60,6 @@ const mutations = {
     }
     syncLocalStorage({ tabstore: state.tabstore });
   },
-  // clearData(state) {
-  //   state = { ...state };
-  // },
 };
 
 const store = new Vuex.Store({

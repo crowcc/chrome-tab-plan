@@ -1,0 +1,34 @@
+[
+    {
+        "type": "Group",
+        "name": "aa",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "wItfjkbJNeHc4o8C"
+    },
+    {
+        "type": "Group",
+        "name": "bb",
+        "parent_id": null,
+        "workspaceRoot": null,
+        "workspacePath": null,
+        "id": "se2U6Z1C758XklTa"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/crowcc/working/private/project/tabs-plan-vue/src",
+        "parent_id": null,
+        "workspaceRoot": "/Users/crowcc/working/private/project/tabs-plan-vue",
+        "workspacePath": "src",
+        "id": "2ShnYdMEtgfOWyxi"
+    },
+    {
+        "type": "Directory",
+        "name": "/Users/crowcc/working/private/project/tabs-plan-vue/src",
+        "parent_id": "wItfjkbJNeHc4o8C",
+        "workspaceRoot": "/Users/crowcc/working/private/project/tabs-plan-vue",
+        "workspacePath": "src",
+        "id": "RwcrQvW6Ah40eIi3"
+    }
+]

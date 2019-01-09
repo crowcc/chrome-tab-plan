@@ -9,7 +9,6 @@
 
 <script>
 import { Input } from 'element-ui';
-// import { debounce } from 'lodash';
 import _ from 'lodash';
 import { VueEditor } from 'vue2-editor';
 
@@ -70,8 +69,8 @@ export default {
     margin:20px 0;
 }
 .todo-header{
-    margin:15px 0;
-    font-size: 20px;
+    margin:10px 0;
+    font-size: 14px;
     font-weight:600;
 }
 </style>
