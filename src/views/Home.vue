@@ -132,6 +132,7 @@ export default {
   height: calc(100vh - 210px);
   border-radius: 3px;
   overflow: auto;
+  font-weight: 600;
 }
 .tab-nav-item {
   border: 1px solid #ebeef5;

@@ -1,30 +1,45 @@
 <template>
   <div id="app">
-    <div v-if='$store.state.inited' id="nav">
-      <Menu router mode="horizontal">
+    <div v-if="$store.state.inited" id="nav">
+      <Menu router mode="horizontal" :default-active="$route.path" class="nav-menu">
         <MenuItem index="/">Tabs</MenuItem>
         <MenuItem index="/Todo">Todo</MenuItem>
       </Menu>
-      <!-- <Tabs v-model="activeNav">
-        <TabPane label="Tabs" name="/"></TabPane>
-        <TabPane label="Todo" name="/Todo"></TabPane>
-      </Tabs> -->
       <div class="asy-action">
         <!-- <Button size="mini" type="text" @click='exportTab'>export</Button>
         <Button size="mini" type="text" class="import-new">import
           <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
-        </Button> -->
-        <Button size="mini" type="text"  @click='syncUpload' :loading="uploading" :style="{width:'50px'}">push</Button>
-        <Button size="mini" type="text" @click='syncDownload' :loading="downloading" :style="{width:'50px'}">pull</Button>
-        <Button size="mini" type="text" @click='editToken'>change token</Button>
-        <Input :style="{width:'200px',marginLeft:'10px'}" v-show="changeTokenV" ref="gitTokenRef" v-model="gitToken" focus size='mini' @blur="saveGitToken" @keyup.enter.native="saveGitToken" />
+        </Button>-->
+        <Button
+          size="mini"
+          type="text"
+          @click="syncUpload"
+          :loading="uploading"
+          :style="{width:'50px'}"
+        >push</Button>
+        <Button
+          size="mini"
+          type="text"
+          @click="syncDownload"
+          :loading="downloading"
+          :style="{width:'50px'}"
+        >pull</Button>
+        <Button size="mini" type="text" @click="editToken">change token</Button>
+        <Input
+          :style="{width:'200px',marginLeft:'10px'}"
+          v-show="changeTokenV"
+          ref="gitTokenRef"
+          v-model="gitToken"
+          focus
+          size="mini"
+          @blur="saveGitToken"
+          @keyup.enter.native="saveGitToken"
+        />
       </div>
-      <!-- <div>
-        <router-link to="/">Tabs</router-link> |
-        <router-link to="/todo">Todo</router-link>
-      </div> -->
     </div>
-    <router-view/>
+    <div class="main-container">
+      <router-view/>
+    </div>
   </div>
 </template>
 <script>
@@ -41,7 +56,6 @@ export default {
       downloading: false,
       changeTokenV: false,
       gitToken: undefined,
-      activeNav: '/',
     };
   },
   components: {
@@ -50,16 +64,10 @@ export default {
     MenuItem,
     Input,
   },
-  watch: {
-    activeNav(v) { this.$router.push({ path: v }); },
-    '$route.path'(v) {
-      if (v !== this.activeNav) {
-        this.activeNav = this.$route.path;
-      }
-    },
-  },
   mounted() {
-    browser.identity.getProfileUserInfo((info) => { description = `tabs plan sync data for ${info.email}`; });
+    browser.identity.getProfileUserInfo((info) => {
+      description = `tabs plan sync data for ${info.email}`;
+    });
 
     browser.storage.local.get('gitToken').then((d) => {
       this.gitToken = d.gitToken;
@@ -117,30 +125,35 @@ export default {
         method: 'GET',
         url: 'https://api.github.com/gists',
         headers: { Authorization: `Bearer ${this.gitToken}` },
-      }).then((response) => {
-        const syncdata = response.data.filter(item => item.description === description);
-        if (syncdata.length) {
-          return syncdata[0];
-        }
-        return this.axios({
-          method: 'POST',
-          url: 'https://api.github.com/gists',
-          headers: { Authorization: `Bearer ${this.gitToken}` },
-          data: {
-            description,
-            public: false,
-            files: {
-              tabsplan: {
-                content: JSON.stringify(this.getTabsObj()),
+      })
+        .then((response) => {
+          const syncdata = response.data.filter(item => item.description === description);
+          if (syncdata.length) {
+            return syncdata[0];
+          }
+          return this.axios({
+            method: 'POST',
+            url: 'https://api.github.com/gists',
+            headers: { Authorization: `Bearer ${this.gitToken}` },
+            data: {
+              description,
+              public: false,
+              files: {
+                tabsplan: {
+                  content: JSON.stringify(this.getTabsObj()),
+                },
               },
             },
-          },
-        }).then(() => { this.downloading = false; this.uploading = false; });
-      }).catch(() => {
-        Message.error('无效token');
-        this.downloading = false;
-        this.uploading = false;
-      });
+          }).then(() => {
+            this.downloading = false;
+            this.uploading = false;
+          });
+        })
+        .catch(() => {
+          Message.error('无效token');
+          this.downloading = false;
+          this.uploading = false;
+        });
     },
     async syncUpload() {
       this.uploading = true;
@@ -157,7 +170,9 @@ export default {
               },
             },
           },
-        }).then(() => { this.uploading = false; });
+        }).then(() => {
+          this.uploading = false;
+        });
       }
     },
     async syncDownload() {
@@ -172,7 +187,8 @@ export default {
           url: `https://api.github.com/gists/${syncdata.id}`,
           headers: { Authorization: `Bearer ${this.gitToken}` },
         }).then((response) => {
-          this.asyncing = false; this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
+          this.asyncing = false;
+          this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
           this.downloading = false;
         });
       }
@@ -192,22 +208,20 @@ export default {
 </script>
 <style lang="scss">
 @import "element-variables";
-body{
-    margin:0;
+body {
+  margin: 0;
 }
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   font-size: 14px;
-  padding: 20px;
   padding-bottom: 0;
 }
 #nav {
-    position: relative;
+  position: relative;
 }
-
 </style>
 <style lang="scss" scoped>
 .import-new {
@@ -221,9 +235,13 @@ body{
   height: 100%;
   width: 100%;
 }
-.asy-action{
-    position: absolute;
-    right:20px;
-    top:5px;
+.asy-action {
+  position: absolute;
+  right: 20px;
+  top: 5px;
+  line-height: 50px;
+}
+.main-container {
+  padding: 20px;
 }
 </style>
