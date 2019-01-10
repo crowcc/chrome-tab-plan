@@ -3,7 +3,7 @@
     <Button @click="savetabs" size="mini" type="primary">save all in this window</Button>
     <Button @click="newlist" size="mini" type="primary">new list</Button>
 
-    <div class="main-container">
+    <div class="home-container">
       <div class="tabs-nav">
         <Tablist
           :filterVal="filterVal"
@@ -112,7 +112,7 @@ export default {
 <style lang="scss" scoped>
 @import "~ui/element-variables";
 
-.main-container {
+.home-container {
   display: flex;
   align-items: flex-start;
 }

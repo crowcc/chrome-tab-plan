@@ -8,6 +8,9 @@
         text-color="#fff"
         class="nav-menu"
       >
+        <div class="main-icon">
+          <img :src="imgsrc">
+        </div>
         <MenuItem index="/">Tabs</MenuItem>
         <MenuItem index="/Todo">Todo</MenuItem>
       </Menu>
@@ -46,6 +49,7 @@
 <script>
 import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
 import browser from 'webextension-polyfill';
+import imgsrc from 'public/img/icon32.png';
 
 let description = 'tabs plan sync data';
 const gistUrl = 'https://api.github.com/gists';
@@ -58,6 +62,7 @@ export default {
       downloading: false,
       changeTokenV: false,
       gitToken: undefined,
+      imgsrc,
     };
   },
   components: {
@@ -155,7 +160,7 @@ export default {
           Message.error('无效token');
           this.downloading = false;
           this.uploading = false;
-      });
+        });
     },
     async syncUpload() {
       this.uploading = true;
@@ -227,6 +232,13 @@ body {
 </style>
 <style lang="scss" scoped>
 @import "~ui/element-variables";
+.main-icon {
+  float: left;
+  padding: 0 60px;
+  display: flex;
+  align-items: center;
+  height: 60px;
+}
 .import-new {
   position: relative;
 }
@@ -252,10 +264,11 @@ body {
     min-width: 50px;
     line-height: 60px;
     padding: 0 8px;
-    color:#fff;
+    color: #fff;
   }
 }
 .main-container {
+  min-height: calc(100vh - 100px);
   padding: 20px;
 }
 .el-menu--horizontal > .el-menu-item {

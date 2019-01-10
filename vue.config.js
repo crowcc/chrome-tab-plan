@@ -12,6 +12,7 @@ module.exports = {
       alias: {
         background: path.resolve(__dirname, 'background'),
         ui: path.resolve(__dirname, 'src'),
+        public: path.resolve(__dirname, 'public'),
       },
       extensions: ['.js', '.vue'],
     },
