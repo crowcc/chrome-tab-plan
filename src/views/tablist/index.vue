@@ -310,7 +310,8 @@ export default {
 .title-line {
   &:hover {
     .tab-action {
-      width: 180px;
+      width: auto;
+      margin-right: 10px;
     }
   }
 }
@@ -320,7 +321,7 @@ export default {
     background-color: darken($--color-primary, 40%);
     color: $--color-primary;
     .tab-action {
-      width: 180px;
+      width: auto;
     }
   }
 }
@@ -334,6 +335,7 @@ export default {
 }
 .tab-list {
   margin: 0 1px;
+  font-size: 13px;
   .tab-item:last-child {
     margin-bottom: 0;
   }
