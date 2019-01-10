@@ -10,6 +10,7 @@
 <script>
 import { Input } from 'element-ui';
 import _ from 'lodash';
+import { changeTodoTodayVal, changeTodoVal } from 'background/utils/storage';
 
 const { debounce } = _;
 
@@ -40,10 +41,10 @@ export default {
   },
   methods: {
     changeTodoTodayVal(value) {
-      this.$store.commit('changeTodoTodayVal', value);
+      changeTodoTodayVal(value);
     },
     changeTodoVal(value) {
-      this.$store.commit('changeTodoVal', value);
+      changeTodoVal(value);
     },
   },
 };

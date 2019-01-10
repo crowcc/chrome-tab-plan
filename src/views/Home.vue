@@ -62,6 +62,7 @@
 import Draggable from 'vuedraggable';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
 import { Button, Input } from 'element-ui';
+import { changeTabStore, newTablist, changeTabBlock, deleteTabList } from 'background/utils/storage';
 import Tablist from './tablist';
 
 export default {
@@ -85,7 +86,7 @@ export default {
         return this.$store.state.tabstore;
       },
       set(value) {
-        this.$store.commit('changeTabStore', value);
+        changeTabStore(value);
       },
     },
   },
@@ -94,17 +95,17 @@ export default {
       saveAllCurrentWIndowTabs();
     },
     newlist() {
-      this.$store.commit('newTablist');
+      newTablist();
     },
     changeTabBlock(key, val, index) {
-      this.$store.commit('changeTabBlock', {
+      changeTabBlock({
         key,
         val,
         index,
       });
     },
     deleteTabList(index) {
-      this.$store.commit('deleteTabList', index);
+      deleteTabList(index);
     },
   },
 };

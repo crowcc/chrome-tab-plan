@@ -374,7 +374,7 @@ export default {
 }
 .empty-list {
   text-align: center;
-  color: rgba(0, 0, 0, 0.3);
+  color: #ddd;
   line-height: 100px;
 }
 .action-btn {

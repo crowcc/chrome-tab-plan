@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <div v-if="$store.state.inited" id="nav">
+  <div id="app" >
+    <div id="nav">
       <Menu
         router
         mode="horizontal"
@@ -49,6 +49,7 @@
 <script>
 import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
 import browser from 'webextension-polyfill';
+import { changeTabStore, changeTodoVal, changeTodoTodayVal } from 'background/utils/storage';
 import imgsrc from 'public/img/icon32.png';
 
 let description = 'tabs plan sync data';
@@ -95,9 +96,9 @@ export default {
       };
     },
     importTabsObj(obj) {
-      this.$store.commit('changeTabStore', obj.tabstore);
-      this.$store.commit('changeTodoVal', obj.todoVal);
-      this.$store.commit('changeTodoTodayVal', obj.todoTodayVal);
+      changeTabStore(obj.tabstore);
+      changeTodoVal(obj.todoVal);
+      changeTodoTodayVal(obj.todoTodayVal);
     },
     exportTab() {
       this.download('tabs-plan.json', JSON.stringify(this.getTabsObj()));
@@ -160,7 +161,7 @@ export default {
           Message.error('无效token');
           this.downloading = false;
           this.uploading = false;
-        });
+      });
     },
     async syncUpload() {
       this.uploading = true;

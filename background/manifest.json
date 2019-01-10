@@ -34,5 +34,28 @@
     "scripts": ["background.js"],
     "persistent": true
   },
+  "commands": {
+    "SAVEONE": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "save current tab"
+    },
+    "SAVECURRENTALL": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1",
+        "mac": "Command+Shift+1"
+      },
+      "description": "save tabs in current window"
+    },
+    "SAVEALL": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+2",
+        "mac": "Command+Shift+2"
+      },
+      "description": "save all tabs"
+    }
+  },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

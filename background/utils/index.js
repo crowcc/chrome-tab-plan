@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import browser from 'webextension-polyfill';
+import { changeTabStore } from './storage';
 
 const { differenceWith, concat, uniqBy } = _;
 export const getCurrentWindow = async () => {
@@ -9,21 +10,26 @@ export const getCurrentWindow = async () => {
 
 export const getTabsByWindow = windowId => browser.tabs.query({ windowId });
 
+export const getCurrentTab = async () => {
+  const windowId = await getCurrentWindow();
+  const tabs = await getTabsByWindow(windowId);
+  return tabs.filter(item => item.active)[0];
+};
+
 export const openAdminPage = async (windowId) => {
   // open only one in a window
   const tabs = await getTabsByWindow(windowId);
   const tabListsUrl = browser.runtime.getURL('index.html#/');
-  //   const urls = tabs.map(item => item.url);
   const results = tabs.filter(item => item.url.indexOf(tabListsUrl) > -1);
   if (!results.length) {
     await browser.tabs.create({ url: tabListsUrl, windowId });
   } else {
-    // const currentAdminTab = tabs[urls.indexOf(tabListsUrl)];
     browser.tabs.highlight({ tabs: results[0].index, windowId: results[0].windowId });
   }
 };
 
 const saveTabs = async (newTabs, windowId) => {
+  await openAdminPage(windowId);
   browser.tabs.remove(newTabs.map(item => item.id));
   const tabstore = await browser.storage.local.get('tabstore');
   if (tabstore) {
@@ -34,11 +40,7 @@ const saveTabs = async (newTabs, windowId) => {
   newTabs = newTabs.map(item => ({ title: item.title, url: item.url }));
   const oldTemp = tabstore.tabstore[0].list;
   tabstore.tabstore[0].list = concat(newTabs, oldTemp);
-
-  browser.runtime.getBackgroundPage().then((win) => {
-    win.vuestore.commit('changeTabStore', tabstore.tabstore);
-  });
-  openAdminPage(windowId);
+  changeTabStore(tabstore.tabstore);
 };
 
 export const saveAllCurrentWIndowTabs = async (tab) => {
