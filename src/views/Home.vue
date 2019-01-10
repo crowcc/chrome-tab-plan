@@ -117,6 +117,7 @@ export default {
   align-items: flex-start;
 }
 .tabs-list {
+  position: relative;
   flex: auto;
   overflow: auto;
   margin-top: 20px;
@@ -125,7 +126,8 @@ export default {
   overflow: hidden;
 }
 .tab-list-scroll {
-  max-height: calc(100vh - 190px);
+  margin-top: 60px;
+  max-height: calc(100vh - 210px);
   overflow: auto;
 }
 .tabs-nav {
@@ -139,16 +141,14 @@ export default {
   overflow: auto;
   background-color: darken($--color-primary, 40%);
   color: #ebebeb;
-//   opacity: 0.9;
-  //   font-weight: 600;
-  //   border: 1px solid lighten($--color-primary, 30%);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .tab-card {
   margin-bottom: 20px;
 }
 .filter-input {
-  margin-bottom: 20px;
+  position: fixed;
+  width:calc(100% - 210px);
 }
 </style>
 

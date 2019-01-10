@@ -188,7 +188,7 @@ export default {
       if (filterVal !== '') {
         const filterResult = this.blockItem.list.filter(item =>
           item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 ||
-          item.url.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 );
+          item.url.toLowerCase().indexOf(filterVal.toLowerCase()) > -1);
         if (filterResult.length) {
           this.showList = true;
         } else {
@@ -315,8 +315,7 @@ export default {
   }
 }
 .tab-item {
-  margin-bottom: 10px;
-  padding: 5px 15px;
+  padding: 10px 15px;
   &:hover {
     background-color: darken($--color-primary, 40%);
     color: $--color-primary;
@@ -331,7 +330,7 @@ export default {
 }
 .title-line {
   font-weight: 600;
-  height: 32px;
+  height: 52px;
 }
 .tab-list {
   margin: 0 1px;
@@ -364,6 +363,7 @@ export default {
   display: flex;
   align-items: center;
   flex: auto;
+  padding:10px;
 }
 .block-title-name {
   margin-left: 10px;
@@ -379,7 +379,6 @@ export default {
   margin-right: 10px;
 }
 .el-card {
-  //  border:1px solid darken($--color-primary, 30%)!important;
   background: #333;
   color: #eee;
 }
@@ -391,7 +390,7 @@ export default {
 <style lang="scss">
 .tablist {
   .el-card__header {
-    padding: 10px 18px;
+    padding: 0;
     border-color: #777;
   }
   .el-card__body {
