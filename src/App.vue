@@ -49,7 +49,6 @@
 <script>
 import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
 import browser from 'webextension-polyfill';
-import { changeTabStore, changeTodoVal, changeTodoTodayVal } from 'background/utils/storage';
 import imgsrc from 'public/img/icon32.png';
 
 let description = 'tabs plan sync data';
@@ -96,9 +95,18 @@ export default {
       };
     },
     importTabsObj(obj) {
-      changeTabStore(obj.tabstore);
-      changeTodoVal(obj.todoVal);
-      changeTodoTodayVal(obj.todoTodayVal);
+      browser.runtime.sendMessage({
+        key: 'changeTabStore',
+        payload: obj.tabstore,
+      });
+      browser.runtime.sendMessage({
+        key: 'changeTodoVal',
+        payload: obj.todoVal,
+      });
+      browser.runtime.sendMessage({
+        key: 'changeTodoTodayVal',
+        payload: obj.todoTodayVal,
+      });
     },
     exportTab() {
       this.download('tabs-plan.json', JSON.stringify(this.getTabsObj()));
@@ -161,7 +169,7 @@ export default {
           Message.error('无效token');
           this.downloading = false;
           this.uploading = false;
-      });
+        });
     },
     async syncUpload() {
       this.uploading = true;
@@ -203,7 +211,10 @@ export default {
     },
     saveGitToken() {
       this.changeTokenV = false;
-      browser.storage.local.set({ gitToken: this.gitToken });
+      browser.runtime.sendMessage({
+        key: 'saveToken',
+        payload: this.gitToken,
+      });
     },
     async debugStorage() {
       console.log(this.$store.state);

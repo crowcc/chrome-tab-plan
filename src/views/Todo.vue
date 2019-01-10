@@ -10,7 +10,7 @@
 <script>
 import { Input } from 'element-ui';
 import _ from 'lodash';
-import { changeTodoTodayVal, changeTodoVal } from 'background/utils/storage';
+import browser from 'webextension-polyfill';
 
 const { debounce } = _;
 
@@ -41,10 +41,16 @@ export default {
   },
   methods: {
     changeTodoTodayVal(value) {
-      changeTodoTodayVal(value);
+      browser.runtime.sendMessage({
+        key: 'changeTodoTodayVal',
+        payload: value,
+      });
     },
     changeTodoVal(value) {
-      changeTodoVal(value);
+      browser.runtime.sendMessage({
+        key: 'changeTodoVal',
+        payload: value,
+      });
     },
   },
 };

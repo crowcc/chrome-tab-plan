@@ -1,42 +1,61 @@
-
 import browser from 'webextension-polyfill';
 
 const syncLocalStorage = (storeMap) => {
   browser.storage.local.set(storeMap);
 };
 
-export function changeTodoTodayVal(payload) {
-  syncLocalStorage({ todoTodayVal: payload });
-}
-export function changeTodoVal(payload) {
-  syncLocalStorage({ todoVal: payload });
-}
-export function changeTabStore(payload) {
-  syncLocalStorage({ tabstore: payload });
-}
-export function changeTabBlock(payload) {
-  const { key, val, index } = payload;
-  browser.storage.local.get('tabstore').then((items) => {
-    const tabstore = items.tabstore;
-    tabstore[index][key] = val;
-    syncLocalStorage({ tabstore });
-  });
-}
-export function newTablist() {
-  browser.storage.local.get('tabstore').then((items) => {
-    const tabstore = items.tabstore;
-    tabstore.push({ title: 'new list', list: [] });
-    syncLocalStorage({ tabstore });
-  });
-}
-export function deleteTabList(payload) {
-  browser.storage.local.get('tabstore').then((items) => {
-    const tabstore = items.tabstore;
+export default class StorageHandle {
+  constructor() {
+    this.storageData = {};
+  }
+  init() {
+    browser.storage.local.get('tabstore').then((items) => {
+      const tabstore = items.tabstore || [
+        {
+          identity: 'temptabs',
+          collapse: false,
+          list: [],
+        },
+      ];
+      this.storageData.tabstore = tabstore;
+      syncLocalStorage({ tabstore });
+      browser.runtime.onMessage.addListener((request) => {
+        this[request.key](request.payload);
+      });
+    });
+  }
+  changeTabBlock(payload) {
+    const { key, val, index } = payload;
+    this.storageData.tabstore[index][key] = val;
+    syncLocalStorage({ tabstore: this.storageData.tabstore });
+  }
+  changeTodoTodayVal(payload) {
+    this.storageData.todoTodayVal = payload;
+    syncLocalStorage({ todoTodayVal: payload });
+  }
+  changeTodoVal(payload) {
+    this.storageData.todoVal = payload;
+    syncLocalStorage({ todoVal: payload });
+  }
+  newTablist() {
+    this.storageData.tabstore.push({ title: 'new list', list: [] });
+    syncLocalStorage({ tabstore: this.storageData.tabstore });
+  }
+  changeTabStore(payload) {
+    this.storageData.tabstore = payload;
+    syncLocalStorage({ tabstore: payload });
+  }
+  deleteTabList(payload) {
+    this.storageData.tabstore.push({ title: 'new list', list: [] });
     if (payload === 0) {
-      tabstore[0].list = [];
+      this.storageData.tabstore[0].list = [];
     } else {
-      tabstore.splice(payload, 1);
+      this.storageData.tabstore.splice(payload, 1);
     }
-    syncLocalStorage({ tabstore });
-  });
+    syncLocalStorage({ tabstore: this.storageData.tabstore });
+  }
+  saveToken(payload) {
+    this.storageData.gitToken = payload;
+    syncLocalStorage({ gitToken: payload });
+  }
 }

@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import browser from 'webextension-polyfill';
-import { changeTabStore } from './storage';
+import StorageHandle from './storage';
 
+export const storageHandle = new StorageHandle();
 const { differenceWith, concat, uniqBy } = _;
 export const getCurrentWindow = async () => {
   const currentWindow = await browser.windows.getCurrent();
@@ -40,7 +41,7 @@ const saveTabs = async (newTabs, windowId) => {
   newTabs = newTabs.map(item => ({ title: item.title, url: item.url }));
   const oldTemp = tabstore.tabstore[0].list;
   tabstore.tabstore[0].list = concat(newTabs, oldTemp);
-  changeTabStore(tabstore.tabstore);
+  storageHandle.changeTabStore(tabstore.tabstore);
 };
 
 export const saveAllCurrentWIndowTabs = async (tab) => {

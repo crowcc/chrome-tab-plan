@@ -28,7 +28,8 @@
     "notifications",
     "identity",
     "identity.email",
-    "declarativeContent"
+    "declarativeContent",
+    "nativeMessaging"
   ],
   "background": {
     "scripts": ["background.js"],

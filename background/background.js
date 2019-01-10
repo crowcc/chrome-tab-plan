@@ -1,9 +1,7 @@
 
 import browser from 'webextension-polyfill';
 import { menulist } from './data/contextMenus';
-import { openAdminPage, getCurrentTab } from './utils';
-
-console.log(process.env.NODE_ENV);
+import { openAdminPage, getCurrentTab, storageHandle } from './utils';
 
 const generateContextMenus = () => {
   Object.keys(menulist).forEach((key) => {
@@ -29,17 +27,7 @@ const init = async () => {
   const window = await browser.runtime.getBackgroundPage();
   if (!window.backgroundStart) {
     window.backgroundStart = true;
-    browser.storage.local.get('tabstore').then((items) => {
-      if (!items.tabstore) {
-        browser.storage.local.set({
-          tabstore: [{
-            identity: 'temptabs',
-            collapse: false,
-            list: [],
-          }],
-        });
-      }
-    });
+    storageHandle.init();
     generateContextMenus();
     addCommand();
     browser.contextMenus.onClicked.addListener(contextMenusClickedHandler);

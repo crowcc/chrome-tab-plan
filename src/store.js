@@ -16,26 +16,30 @@ const state = {
   todoVal: '',
   todoTodayVal: '',
 };
-
-const mutations = {
-  init(state) {
+const actions = {
+  init({ commit }) {
     browser.storage.local.get('tabstore').then((items) => {
       if (items.tabstore) {
-        state.tabstore = items.tabstore;
+        commit('saveState', { key: 'tabstore', val: items.tabstore });
       }
     });
     // todo
     browser.storage.local.get('todoVal').then((items) => {
-      state.todoVal = items.todoVal;
+      commit('saveState', { key: 'todoVal', val: items.todoVal });
     });
     browser.storage.local.get('todoTodayVal').then((items) => {
-      state.todoTodayVal = items.todoTodayVal;
+      commit('saveState', { key: 'todoTodayVal', val: items.todoTodayVal });
     });
     browser.storage.onChanged.addListener((field) => {
       Object.keys(field).forEach((key) => {
-        state[key] = field[key].newValue;
+        commit('saveState', { key, val: field[key].newValue });
       });
     });
+  },
+};
+const mutations = {
+  saveState(state, payload) {
+    state[payload.key] = payload.val;
   },
 };
 
@@ -44,5 +48,6 @@ export default new Vuex.Store({
   namespaced: true,
   state,
   mutations,
+  actions,
   strict: debug,
 });

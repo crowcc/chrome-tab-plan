@@ -295,10 +295,12 @@ export default {
 @import "~ui/element-variables";
 
 .tab-nav-item {
-  padding: 10px;
   border: 1px solid #333;
   border-top: none;
   cursor: pointer;
+}
+.drag-group {
+  padding: 15px 10px;
 }
 .tab-item,
 .title-line {
@@ -365,7 +367,7 @@ export default {
   display: flex;
   align-items: center;
   flex: auto;
-  padding:10px;
+  padding: 10px;
 }
 .block-title-name {
   margin-left: 10px;

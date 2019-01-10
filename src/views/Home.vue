@@ -62,7 +62,7 @@
 import Draggable from 'vuedraggable';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
 import { Button, Input } from 'element-ui';
-import { changeTabStore, newTablist, changeTabBlock, deleteTabList } from 'background/utils/storage';
+import browser from 'webextension-polyfill';
 import Tablist from './tablist';
 
 export default {
@@ -86,7 +86,10 @@ export default {
         return this.$store.state.tabstore;
       },
       set(value) {
-        changeTabStore(value);
+        browser.runtime.sendMessage({
+          key: 'changeTabStore',
+          payload: value,
+        });
       },
     },
   },
@@ -95,17 +98,25 @@ export default {
       saveAllCurrentWIndowTabs();
     },
     newlist() {
-      newTablist();
+      browser.runtime.sendMessage({
+        key: 'newTablist',
+      });
     },
     changeTabBlock(key, val, index) {
-      changeTabBlock({
-        key,
-        val,
-        index,
+      browser.runtime.sendMessage({
+        key: 'changeTabBlock',
+        payload: {
+          key,
+          val,
+          index,
+        },
       });
     },
     deleteTabList(index) {
-      deleteTabList(index);
+      browser.runtime.sendMessage({
+        key: 'deleteTabList',
+        payload: index,
+      });
     },
   },
 };

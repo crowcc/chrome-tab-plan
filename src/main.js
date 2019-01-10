@@ -13,7 +13,7 @@ if (!window.init) {
   window.init = true;
   Vue.prototype.store = store;
   Vue.prototype.axios = axios;
-  store.commit('init');
+  store.dispatch('init');
   new Vue({
     router,
     store,
