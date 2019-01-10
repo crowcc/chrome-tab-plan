@@ -2,7 +2,7 @@
   <div class="todo">
     <div class="todo-header">Today</div>
     <Input type="textarea" :autosize="{ minRows: 4}" placeholder="请输入内容" v-model="todoTodayVal"/>
-    <div class="todo-header">Next</div>
+    <div class="todo-header" :style="{marginTop:'10px'}">Next</div>
     <Input type="textarea" :autosize="{ minRows: 4}" placeholder="请输入内容" v-model="todoVal"/>
   </div>
 </template>
@@ -54,8 +54,8 @@ export default {
   .el-textarea__inner {
     background-color: #ddd;
     border-color: #c0c4cc;
-    &:focus{
-        border-color: darken($--color-primary, 10%);
+    &:focus {
+      border-color: darken($--color-primary, 10%);
     }
   }
 }
@@ -66,8 +66,11 @@ export default {
   margin: 20px 0;
 }
 .todo-header {
-  margin: 10px 0;
+  padding: 10px;
   font-size: 14px;
   font-weight: 600;
+  color: #ddd;
+  background-color: #333;
+  border-radius: 3px;
 }
 </style>
