@@ -7,7 +7,10 @@
         :id="`drag-group${blockIndex}`"
         v-model="tablist"
         :options="{group:'tab-item'}"
-      >{{blockItem.title||'临时'}}</Draggable>
+      >
+        {{blockItem.title||'临时'}}
+        <span class="block-num">{{tablist.length}}</span>
+      </Draggable>
     </div>
     <div class="tablist" v-if="!showTitleOnly&&showList" :id="'blockid'+blockIndex">
       <Card class="box-card">
@@ -25,11 +28,17 @@
               <i :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
               <div class="block-title-name">
                 <span @click="editTitle">{{blockItem.title||'临时'}}</span>
-                <span class='block-num'>{{tablist.length}}</span>
               </div>
             </div>
             <div class="tab-action">
-              <Button round size="small" @click="openAll">Open</Button>
+              <Button
+                circle
+                size="small"
+                type="primary"
+                icon="el-icon-caret-right
+"
+                @click="openAll"
+              ></Button>
               <Button
                 v-if="!isStatic"
                 size="small"
@@ -65,7 +74,9 @@
               class="tab-item"
             >
               <div class="tab-title" @click="()=>openTabPage(element)">
-              <div>{{element.title}}</div><div>{{element.url}}</div></div>
+                <div>{{element.title}}</div>
+                <div>{{element.url}}</div>
+              </div>
               <div class="tab-action">
                 <Button
                   size="small"
@@ -175,7 +186,9 @@ export default {
   watch: {
     filterVal(filterVal) {
       if (filterVal !== '') {
-        const filterResult = this.blockItem.list.filter(item => (item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 || item.url.toLowerCase().indexOf(filterVal.toLowerCase()) > -1));
+        const filterResult = this.blockItem.list.filter(item =>
+          item.title.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 ||
+          item.url.toLowerCase().indexOf(filterVal.toLowerCase()) > -1 );
         if (filterResult.length) {
           this.showList = true;
         } else {
@@ -283,7 +296,7 @@ export default {
 
 .tab-nav-item {
   padding: 10px;
-  border: 1px solid #ebeef5;
+  border: 1px solid #333;
   border-top: none;
   cursor: pointer;
 }
@@ -305,15 +318,16 @@ export default {
   margin-bottom: 10px;
   padding: 5px 15px;
   &:hover {
-    background-color: lighten($--color-primary, 50%);
+    background-color: darken($--color-primary, 40%);
     color: $--color-primary;
     .tab-action {
-      width: 130px;
+      width: 180px;
     }
   }
 }
-.block-num{
-    margin-left: 20px;
+.block-num {
+  font-weight: normal;
+  float: right;
 }
 .title-line {
   font-weight: 600;
@@ -334,8 +348,8 @@ export default {
   flex: auto;
   border-radius: 3px;
   line-height: 19px;
-  &>div:nth-child(2){
-      color:#888;
+  & > div:nth-child(2) {
+    color: #888;
   }
 }
 .tab-action {
@@ -364,12 +378,21 @@ export default {
 .action-btn {
   margin-right: 10px;
 }
+.el-card {
+  //  border:1px solid darken($--color-primary, 30%)!important;
+  background: #333;
+  color: #eee;
+}
+.el-card__header {
+  border-bottom: #666;
+}
 </style>
 
 <style lang="scss">
 .tablist {
   .el-card__header {
     padding: 10px 18px;
+    border-color: #777;
   }
   .el-card__body {
     padding: 0;

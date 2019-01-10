@@ -22,8 +22,6 @@ module.exports = {
           to: 'manifest.json',
         },
         { from: 'background/_locales', to: '_locales' },
-        { from: 'background/options.html', to: 'options.html' },
-        { from: 'background/options.js', to: 'options.js' },
       ]),
     ],
   },

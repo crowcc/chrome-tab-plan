@@ -1,8 +1,8 @@
 <template>
   <div class="home">
-    <Button @click="savetabs" size="mini" type="primary" plain>save all in this window</Button>
-    <Button @click="newlist" size="mini" type="primary" plain>new list</Button>
-    <Input class="filter-input" placeholder="搜索" v-model="filterVal"/>
+    <Button @click="savetabs" size="mini" type="primary">save all in this window</Button>
+    <Button @click="newlist" size="mini" type="primary">new list</Button>
+
     <div class="main-container">
       <div class="tabs-nav">
         <Tablist
@@ -28,28 +28,31 @@
         </Draggable>
       </div>
       <div class="tabs-list">
-        <Tablist
-          class="tab-card"
-          :filterVal="filterVal"
-          :blockItem="tabstore[0]"
-          :changelist="(key,val)=>changeTabBlock(key,val,0)"
-          :deleteTabList="()=>deleteTabList(0)"
-          isStatic
-        ></Tablist>
-        <Draggable v-model="tabstore" :options="{group:'tabstore'}">
-          <template v-for="(value, index) in tabstore">
-            <Tablist
-              v-if="index!==0"
-              class="tab-group tab-card"
-              :filterVal="filterVal"
-              :key="index"
-              :blockIndex="index"
-              :blockItem="value"
-              :changelist="(key,val)=>changeTabBlock(key,val,index)"
-              :deleteTabList="()=>deleteTabList(index)"
-            ></Tablist>
-          </template>
-        </Draggable>
+        <Input class="filter-input" placeholder="搜索" v-model="filterVal"/>
+        <div class="tab-list-scroll">
+          <Tablist
+            class="tab-card"
+            :filterVal="filterVal"
+            :blockItem="tabstore[0]"
+            :changelist="(key,val)=>changeTabBlock(key,val,0)"
+            :deleteTabList="()=>deleteTabList(0)"
+            isStatic
+          ></Tablist>
+          <Draggable v-model="tabstore" :options="{group:'tabstore'}">
+            <template v-for="(value, index) in tabstore">
+              <Tablist
+                v-if="index!==0"
+                class="tab-group tab-card"
+                :filterVal="filterVal"
+                :key="index"
+                :blockIndex="index"
+                :blockItem="value"
+                :changelist="(key,val)=>changeTabBlock(key,val,index)"
+                :deleteTabList="()=>deleteTabList(index)"
+              ></Tablist>
+            </template>
+          </Draggable>
+        </div>
       </div>
     </div>
   </div>
@@ -107,32 +110,45 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "~ui/element-variables";
+
 .main-container {
   display: flex;
+  align-items: flex-start;
 }
 .tabs-list {
   flex: auto;
   overflow: auto;
-  height: calc(100vh - 210px);
   margin-top: 20px;
   margin-left: 20px;
+  max-height: calc(100vh - 150px);
+  overflow: hidden;
+}
+.tab-list-scroll {
+  max-height: calc(100vh - 190px);
+  overflow: auto;
 }
 .tabs-nav {
   flex: none;
   margin-top: 20px;
   width: 150px;
   font-size: 12px;
-  border-top: 1px solid #ebeef5;
-  height: calc(100vh - 210px);
+  border-top: 1px solid #333;
+  max-height: calc(100vh - 150px);
   border-radius: 3px;
   overflow: auto;
-  font-weight: 600;
+  background-color: darken($--color-primary, 40%);
+  color: #ebebeb;
+//   opacity: 0.9;
+  //   font-weight: 600;
+  //   border: 1px solid lighten($--color-primary, 30%);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .tab-card {
   margin-bottom: 20px;
 }
 .filter-input {
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
 

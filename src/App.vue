@@ -1,27 +1,30 @@
 <template>
   <div id="app">
     <div v-if="$store.state.inited" id="nav">
-      <Menu router mode="horizontal" :default-active="$route.path" class="nav-menu">
+      <Menu
+        router
+        mode="horizontal"
+        :default-active="$route.path"
+        text-color="#fff"
+        class="nav-menu"
+      >
         <MenuItem index="/">Tabs</MenuItem>
         <MenuItem index="/Todo">Todo</MenuItem>
       </Menu>
       <div class="asy-action">
-        <Button size="mini" type="text" @click='exportTab'>export</Button>
-        <Button size="mini" type="text" class="import-new">import
-          <input id="file" class="import-old" @change="importFile" type="file" accept="application/json" />
+        <Button size="mini" type="text" @click="exportTab">export</Button>
+        <Button size="mini" type="text" class="import-new">
+          import
+          <input
+            id="file"
+            class="import-old"
+            @change="importFile"
+            type="file"
+            accept="application/json"
+          >
         </Button>
-        <Button
-          size="mini"
-          type="text"
-          @click="syncUpload"
-          :loading="uploading"
-        >push</Button>
-        <Button
-          size="mini"
-          type="text"
-          @click="syncDownload"
-          :loading="downloading"
-        >pull</Button>
+        <Button size="mini" type="text" @click="syncUpload" :loading="uploading">push</Button>
+        <Button size="mini" type="text" @click="syncDownload" :loading="downloading">pull</Button>
         <Button size="mini" type="text" @click="editToken">change token</Button>
         <Input
           :style="{width:'200px',marginLeft:'10px'}"
@@ -152,7 +155,7 @@ export default {
           Message.error('无效token');
           this.downloading = false;
           this.uploading = false;
-        });
+      });
     },
     async syncUpload() {
       this.uploading = true;
@@ -216,6 +219,7 @@ body {
   color: #2c3e50;
   font-size: 14px;
   padding-bottom: 0;
+  background-color: #ddd;
 }
 #nav {
   position: relative;
@@ -233,27 +237,37 @@ body {
   opacity: 0;
   height: 100%;
   width: 100%;
+  cursor: pointer;
 }
-.nav-menu{
-    background-color: lighten($--color-primary, 50%);
-    border-color:lighten($--color-primary, 30%)!important;
+.nav-menu {
+  background-color: darken($--color-primary, 40%);
+  border-color: lighten($--color-primary, 30%) !important;
 }
 .asy-action {
   position: absolute;
   right: 20px;
   top: 0;
   line-height: 61px;
-  button{
-      min-width:50px;
-      line-height: 60px;
-      padding: 0 8px;
-
+  button {
+    min-width: 50px;
+    line-height: 60px;
+    padding: 0 8px;
+    color:#fff;
   }
 }
 .main-container {
   padding: 20px;
 }
-.el-menu--horizontal > .el-menu-item:hover{
-background-color: lighten($--color-primary, 40%)!important;
+.el-menu--horizontal > .el-menu-item {
+  &:hover {
+    background-color: darken($--color-primary, 20%) !important;
+  }
+  &:focus {
+    background-color: rgba(0, 0, 0, 0) !important;
+  }
+}
+.el-menu--horizontal > .el-menu-item.is-active {
+  color: $--color-primary !important;
+  background-color: darken($--color-primary, 30%) !important;
 }
 </style>
