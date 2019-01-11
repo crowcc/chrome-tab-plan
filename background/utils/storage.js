@@ -31,11 +31,11 @@ export default class StorageHandle {
   }
   changeTodoTodayVal(payload) {
     this.storageData.todoTodayVal = payload;
-    syncLocalStorage({ todoTodayVal: payload });
+    syncLocalStorage({ todoTodayVal: this.storageData.todoTodayVal });
   }
   changeTodoVal(payload) {
     this.storageData.todoVal = payload;
-    syncLocalStorage({ todoVal: payload });
+    syncLocalStorage({ todoVal: this.storageData.todoVal });
   }
   newTablist() {
     this.storageData.tabstore.push({ title: 'new list', list: [] });
@@ -43,7 +43,7 @@ export default class StorageHandle {
   }
   changeTabStore(payload) {
     this.storageData.tabstore = payload;
-    syncLocalStorage({ tabstore: payload });
+    syncLocalStorage({ tabstore: this.storageData.tabstore });
   }
   deleteTabList(payload) {
     this.storageData.tabstore.push({ title: 'new list', list: [] });
@@ -56,6 +56,6 @@ export default class StorageHandle {
   }
   saveToken(payload) {
     this.storageData.gitToken = payload;
-    syncLocalStorage({ gitToken: payload });
+    syncLocalStorage({ gitToken: this.storageData.gitToken });
   }
 }
