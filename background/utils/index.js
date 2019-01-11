@@ -63,7 +63,7 @@ export const saveAllWIndowTabs = async (tab) => {
 };
 
 export const saveCurrentTab = async (tab) => {
-  if (tab) {
+  if (tab && !/^chrome/.test(tab.url)) {
     saveTabs([tab], tab.windowId);
   }
 };

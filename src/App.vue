@@ -26,9 +26,9 @@
             accept="application/json"
           >
         </Button>
-        <Button size="mini" type="text" @click="syncUpload" :loading="uploading">push</Button>
-        <Button size="mini" type="text" @click="syncDownload" :loading="downloading">pull</Button>
-        <Button size="mini" type="text" @click="editToken">change token</Button>
+        <Button size="mini" type="text" @click="syncUpload" :loading="uploading">upload</Button>
+        <Button size="mini" type="text" @click="syncDownload" :loading="downloading">download</Button>
+        <Button size="mini" type="text" @click="editToken">gist token</Button>
         <Input
           :style="{width:'200px',marginLeft:'10px'}"
           v-show="changeTokenV"
@@ -132,7 +132,7 @@ export default {
     },
     async initSync() {
       if (!this.gitToken) {
-        Message.error('请先录入git token');
+        Message.error('Need to input a gist token first');
         this.downloading = false;
         this.uploading = false;
         return;
@@ -166,10 +166,10 @@ export default {
           });
         })
         .catch(() => {
-          Message.error('无效token');
+          Message.error('Invalid token');
           this.downloading = false;
           this.uploading = false;
-        });
+      });
     },
     async syncUpload() {
       this.uploading = true;

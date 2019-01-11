@@ -1,9 +1,9 @@
 <template>
   <div class="todo">
     <div class="todo-header">Today</div>
-    <Input type="textarea" :autosize="{ minRows: 4}" placeholder="请输入内容" v-model="todoTodayVal"/>
+    <Input type="textarea" :autosize="{ minRows: 4}" placeholder="please input..." v-model="todoTodayVal"/>
     <div class="todo-header" :style="{marginTop:'10px'}">Next</div>
-    <Input type="textarea" :autosize="{ minRows: 4}" placeholder="请输入内容" v-model="todoVal"/>
+    <Input type="textarea" :autosize="{ minRows: 4}" placeholder="please input..." v-model="todoVal"/>
   </div>
 </template>
 

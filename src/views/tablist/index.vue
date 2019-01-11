@@ -8,7 +8,7 @@
         v-model="tablist"
         :options="{group:'tab-item'}"
       >
-        {{blockItem.title||'临时'}}
+        {{blockItem.title||'Temp'}}
         <span class="block-num">{{tablist.length}}</span>
       </Draggable>
     </div>
@@ -17,9 +17,10 @@
         <div slot="header" class="clearfix">
           <Input
             v-show="editingTitle"
+            class="title-input"
             ref="titleInput"
             v-model="titleVal"
-            placeholder="请输入标题"
+            placeholder="please input"
             @blur="saveTitle"
             @keyup.enter.native="saveTitle"
           />
@@ -27,7 +28,7 @@
             <div class="block-title-line" @click="collapseTabs">
               <i :class="!blockItem.collapse?'el-icon-arrow-down':'el-icon-arrow-right'"></i>
               <div class="block-title-name">
-                <span @click="editTitle">{{blockItem.title||'临时'}}</span>
+                <span @click.stop="editTitle">{{blockItem.title||'Temp'}}</span>
               </div>
             </div>
             <div class="tab-action">
@@ -94,22 +95,22 @@
                 ></Button>
               </div>
             </div>
-            <div class="empty-list" v-if="!tablist||!tablist.length">拖入tab以添加</div>
+            <div class="empty-list" v-if="!tablist||!tablist.length">drag tabs here</div>
           </Draggable>
         </CollapseTransition>
       </Card>
-      <Dialog title="修改标签" :visible.sync="editTabVisible">
+      <Dialog title="edit tab" :visible.sync="editTabVisible">
         <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
-          <FormItem label="标签名称" prop="title">
+          <FormItem label="tab name" prop="title">
             <Input v-model="tabForm.title"/>
           </FormItem>
-          <FormItem label="url地址" prop="url">
+          <FormItem label="url" prop="url">
             <Input v-model="tabForm.url"/>
           </FormItem>
         </Form>
         <span slot="footer" class="dialog-footer">
-          <Button @click="editTabVisible = false; $refs.form.resetFields();">取 消</Button>
-          <Button type="primary" @click="editTab">确 定</Button>
+          <Button @click="editTabVisible = false; $refs.form.resetFields();">cancle</Button>
+          <Button type="primary" @click="editTab">submit</Button>
         </span>
       </Dialog>
     </div>
@@ -143,8 +144,8 @@ export default {
         url: '',
       },
       rules: {
-        title: [{ required: true, message: '请输入标签名称', trigger: 'blur' }],
-        url: [{ required: true, message: '请输入url地址', trigger: 'blur' }],
+        title: [{ required: true, message: 'tab name is required', trigger: 'blur' }],
+        url: [{ required: true, message: 'url is required', trigger: 'blur' }],
       },
       editingIndex: '',
     };
@@ -157,7 +158,7 @@ export default {
     blockItem: {
       type: Object,
       default: () => ({
-        title: '临时',
+        title: 'Temp',
         list: [],
         collapse: false,
       }),
@@ -316,6 +317,10 @@ export default {
       margin-right: 10px;
     }
   }
+}
+.title-input{
+    padding:6px;
+    width:calc(100% - 13px)
 }
 .tab-item {
   padding: 10px 15px;
