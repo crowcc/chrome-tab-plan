@@ -46,7 +46,6 @@ export default class StorageHandle {
     syncLocalStorage({ tabstore: this.storageData.tabstore });
   }
   deleteTabList(payload) {
-    this.storageData.tabstore.push({ title: 'new list', list: [] });
     if (payload === 0) {
       this.storageData.tabstore[0].list = [];
     } else {

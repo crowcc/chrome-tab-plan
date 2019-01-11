@@ -101,7 +101,7 @@
       </Card>
       <Dialog title="edit tab" :visible.sync="editTabVisible">
         <Form :model="tabForm" :rules="rules" ref="form" label-width="80px">
-          <FormItem label="tab name" prop="title">
+          <FormItem label="name" prop="title">
             <Input v-model="tabForm.title"/>
           </FormItem>
           <FormItem label="url" prop="url">
