@@ -110,7 +110,7 @@
         </Form>
         <span slot="footer" class="dialog-footer">
           <Button @click="editTabVisible = false; $refs.form.resetFields();">cancle</Button>
-          <Button type="primary" @click="editTab">submit</Button>
+          <Button type="primary" @click="editTab">confirm</Button>
         </span>
       </Dialog>
     </div>
@@ -126,6 +126,7 @@ import {
   Form,
   FormItem,
   Popover,
+  MessageBox,
 } from 'element-ui';
 import _ from 'lodash';
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
@@ -246,9 +247,18 @@ export default {
       this.changelist('title', this.titleVal);
     },
     deleteTab(index) {
-      const list = cloneDeep(this.blockItem.list);
-      list.splice(index, 1);
-      this.changelist('list', list);
+      MessageBox.confirm(
+        'Are you sure to delete this tab?',
+        {
+          confirmButtonText: 'confirm',
+          cancelButtonText: 'cancel',
+          type: 'warning',
+        },
+      ).then(() => {
+        const list = cloneDeep(this.blockItem.list);
+        list.splice(index, 1);
+        this.changelist('list', list);
+      });
     },
     openAll() {
       this.blockItem.list.forEach((item) => {

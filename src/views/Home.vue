@@ -61,7 +61,7 @@
 <script>
 import Draggable from 'vuedraggable';
 import { saveAllCurrentWIndowTabs } from 'background/utils';
-import { Button, Input } from 'element-ui';
+import { Button, Input, MessageBox } from 'element-ui';
 import browser from 'webextension-polyfill';
 import Tablist from './tablist';
 
@@ -113,9 +113,18 @@ export default {
       });
     },
     deleteTabList(index) {
-      browser.runtime.sendMessage({
-        key: 'deleteTabList',
-        payload: index,
+      MessageBox.confirm(
+        'Are you sure you want to delete this group and all tabs in it?',
+        {
+          confirmButtonText: 'confirm',
+          cancelButtonText: 'cancel',
+          type: 'warning',
+        },
+      ).then(() => {
+        browser.runtime.sendMessage({
+          key: 'deleteTabList',
+          payload: index,
+        });
       });
     },
   },

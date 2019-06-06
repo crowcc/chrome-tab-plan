@@ -1,5 +1,5 @@
 <template>
-  <div id="app" >
+  <div id="app">
     <div id="nav">
       <Menu
         router
@@ -47,7 +47,7 @@
   </div>
 </template>
 <script>
-import { Button, Input, Message, Menu, MenuItem } from 'element-ui';
+import { Button, Input, Message, Menu, MenuItem, MessageBox } from 'element-ui';
 import browser from 'webextension-polyfill';
 import imgsrc from 'public/img/icon32.png';
 
@@ -171,43 +171,63 @@ export default {
           this.uploading = false;
       });
     },
-    async syncUpload() {
-      this.uploading = true;
-      const syncdata = await this.initSync();
-      if (syncdata.id) {
-        this.axios({
-          method: 'PATCH',
-          url: `${gistUrl}/${syncdata.id}`,
-          headers: { Authorization: `Bearer ${this.gitToken}` },
-          data: {
-            files: {
-              tabsplan: {
-                content: JSON.stringify(this.getTabsObj()),
+    syncUpload() {
+      MessageBox.confirm(
+        'This will replace remote data with local, continue?',
+        'Warn',
+        {
+          confirmButtonText: 'confirm',
+          cancelButtonText: 'cancel',
+          type: 'warning',
+        },
+      ).then(async () => {
+        this.uploading = true;
+        const syncdata = await this.initSync();
+        if (syncdata.id) {
+          this.axios({
+            method: 'PATCH',
+            url: `${gistUrl}/${syncdata.id}`,
+            headers: { Authorization: `Bearer ${this.gitToken}` },
+            data: {
+              files: {
+                tabsplan: {
+                  content: JSON.stringify(this.getTabsObj()),
+                },
               },
             },
-          },
-        }).then(() => {
-          this.uploading = false;
-        });
-      }
+          }).then(() => {
+            this.uploading = false;
+          });
+        }
+      });
     },
-    async syncDownload() {
-      this.downloading = true;
-      const syncdata = await this.initSync();
-      if (syncdata === 'OK') {
-        return;
-      }
-      if (syncdata.id) {
-        this.axios({
-          method: 'GET',
-          url: `${gistUrl}/${syncdata.id}`,
-          headers: { Authorization: `Bearer ${this.gitToken}` },
-        }).then((response) => {
-          this.asyncing = false;
-          this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
-          this.downloading = false;
-        });
-      }
+    syncDownload() {
+      MessageBox.confirm(
+        'This will replace local data with remote, continue?',
+        'Warn',
+        {
+          confirmButtonText: 'confirm',
+          cancelButtonText: 'cancel',
+          type: 'warning',
+        },
+      ).then(async () => {
+        this.downloading = true;
+        const syncdata = await this.initSync();
+        if (syncdata === 'OK') {
+          return;
+        }
+        if (syncdata.id) {
+          this.axios({
+            method: 'GET',
+            url: `${gistUrl}/${syncdata.id}`,
+            headers: { Authorization: `Bearer ${this.gitToken}` },
+          }).then((response) => {
+            this.asyncing = false;
+            this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
+            this.downloading = false;
+          });
+        }
+      });
     },
     saveGitToken() {
       this.changeTokenV = false;
