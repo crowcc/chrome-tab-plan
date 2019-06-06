@@ -1,7 +1,12 @@
 import browser from 'webextension-polyfill';
 
-const syncLocalStorage = (storeMap) => {
-  browser.storage.local.set(storeMap);
+const syncLocalStorage = (storeMap, updateTime = true) => {
+  if (updateTime) {
+    console.log('update timestamp');
+    browser.storage.local.set({ ...storeMap, timestamp: new Date().getTime() });
+  } else {
+    browser.storage.local.set(storeMap);
+  }
 };
 
 export default class StorageHandle {
@@ -18,7 +23,7 @@ export default class StorageHandle {
         },
       ];
       this.storageData.tabstore = tabstore;
-      syncLocalStorage({ tabstore });
+      syncLocalStorage({ tabstore }, false);
       browser.runtime.onMessage.addListener((request) => {
         this[request.key](request.payload);
       });
@@ -55,6 +60,6 @@ export default class StorageHandle {
   }
   saveToken(payload) {
     this.storageData.gitToken = payload;
-    syncLocalStorage({ gitToken: this.storageData.gitToken });
+    syncLocalStorage({ gitToken: this.storageData.gitToken }, false);
   }
 }

@@ -15,6 +15,7 @@ const state = {
   }],
   todoVal: '',
   todoTodayVal: '',
+  timestamp: 0,
 };
 const actions = {
   init({ commit }) {
@@ -29,6 +30,9 @@ const actions = {
     });
     browser.storage.local.get('todoTodayVal').then((items) => {
       commit('saveState', { key: 'todoTodayVal', val: items.todoTodayVal });
+    });
+    browser.storage.local.get('timestamp').then((items) => {
+      commit('saveState', { key: 'timestamp', val: items.timestamp });
     });
     browser.storage.onChanged.addListener((field) => {
       Object.keys(field).forEach((key) => {

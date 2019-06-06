@@ -28,6 +28,7 @@
         </Button>
         <Button size="mini" type="text" @click="syncUpload" :loading="uploading">upload</Button>
         <Button size="mini" type="text" @click="syncDownload" :loading="downloading">download</Button>
+        <Button size="mini" type="text" @click="sync" :loading="syncing">sync(TEST)</Button>
         <Button size="mini" type="text" @click="editToken">gist token</Button>
         <Input
           :style="{width:'200px',marginLeft:'10px'}"
@@ -60,6 +61,7 @@ export default {
     return {
       uploading: false,
       downloading: false,
+      syncing: false,
       changeTokenV: false,
       gitToken: undefined,
       imgsrc,
@@ -71,14 +73,11 @@ export default {
     MenuItem,
     Input,
   },
-  mounted() {
+  async mounted() {
     browser.identity.getProfileUserInfo((info) => {
       description = `tabs plan sync data for ${info.email}`;
     });
-
-    browser.storage.local.get('gitToken').then((d) => {
-      this.gitToken = d.gitToken;
-    });
+    this.gitToken = await browser.storage.local.get('gitToken').gitToken;
   },
   methods: {
     editToken() {
@@ -89,6 +88,7 @@ export default {
     },
     getTabsObj() {
       return {
+        timestamp: this.$store.state.timestamp,
         tabstore: this.$store.state.tabstore,
         todoVal: this.$store.state.todoVal,
         todoTodayVal: this.$store.state.todoTodayVal,
@@ -135,6 +135,7 @@ export default {
         Message.error('Need to input a gist token first');
         this.downloading = false;
         this.uploading = false;
+        this.syncing = false;
         return;
       }
       return this.axios({
@@ -169,7 +170,7 @@ export default {
           Message.error('Invalid token');
           this.downloading = false;
           this.uploading = false;
-      });
+        });
     },
     syncUpload() {
       MessageBox.confirm(
@@ -180,25 +181,9 @@ export default {
           cancelButtonText: 'cancel',
           type: 'warning',
         },
-      ).then(async () => {
+      ).then(() => {
         this.uploading = true;
-        const syncdata = await this.initSync();
-        if (syncdata.id) {
-          this.axios({
-            method: 'PATCH',
-            url: `${gistUrl}/${syncdata.id}`,
-            headers: { Authorization: `Bearer ${this.gitToken}` },
-            data: {
-              files: {
-                tabsplan: {
-                  content: JSON.stringify(this.getTabsObj()),
-                },
-              },
-            },
-          }).then(() => {
-            this.uploading = false;
-          });
-        }
+        this.confirmUpload();
       });
     },
     syncDownload() {
@@ -222,12 +207,62 @@ export default {
             url: `${gistUrl}/${syncdata.id}`,
             headers: { Authorization: `Bearer ${this.gitToken}` },
           }).then((response) => {
-            this.asyncing = false;
             this.importTabsObj(JSON.parse(response.data.files.tabsplan.content));
             this.downloading = false;
           });
         }
       });
+    },
+    async confirmUpload() {
+      const syncdata = await this.initSync();
+      if (syncdata.id) {
+        this.axios({
+          method: 'PATCH',
+          url: `${gistUrl}/${syncdata.id}`,
+          headers: { Authorization: `Bearer ${this.gitToken}` },
+          data: {
+            files: {
+              tabsplan: {
+
+                content: JSON.stringify(this.getTabsObj()),
+              },
+            },
+          },
+        }).then(() => {
+          this.uploading = false;
+          this.syncing = false;
+        });
+      }
+    },
+    async sync() {
+      this.syncing = true;
+      const syncdata = await this.initSync();
+      if (syncdata === 'OK') {
+        this.syncing = false;
+        return;
+      }
+      if (syncdata.id) {
+        this.axios({
+          method: 'GET',
+          url: `${gistUrl}/${syncdata.id}`,
+          headers: { Authorization: `Bearer ${this.gitToken}` },
+        }).then((response) => {
+          const content = JSON.parse(response.data.files.tabsplan.content);
+          const localTimestamp = this.$store.state.timestamp;
+          if ((content.timestamp && !localTimestamp) || content.timestamp > localTimestamp) {
+            console.log('use remote');
+            this.importTabsObj(content);
+            this.syncing = false;
+          } else if ((!content.timestamp && localTimestamp) || content.timestamp < localTimestamp) {
+            console.log('use local');
+            this.confirmUpload();
+          } else {
+            this.syncing = false;
+          }
+        });
+      } else {
+        this.syncing = false;
+      }
     },
     saveGitToken() {
       this.changeTokenV = false;
@@ -257,6 +292,7 @@ body {
   font-size: 14px;
   padding-bottom: 0;
   background-color: #ddd;
+  min-width: 800px;
 }
 #nav {
   position: relative;
