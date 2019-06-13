@@ -164,12 +164,11 @@ export default {
             this.downloading = false;
             this.uploading = false;
           });
-        })
-        .catch(() => {
+        }).catch(() => {
           Message.error('Invalid token');
           this.downloading = false;
           this.uploading = false;
-      });
+        });
     },
     syncUpload() {
       MessageBox.confirm(

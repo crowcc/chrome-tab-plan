@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <Button @click="savetabs" size="mini" type="primary">save all in this window</Button>
+    <Button @click="newlistWithTabs" size="mini" type="primary">save all in this window(new list)</Button>
     <Button @click="newlist" size="mini" type="primary">new list</Button>
 
     <div class="home-container">
@@ -28,7 +29,7 @@
         </Draggable>
       </div>
       <div class="tabs-list">
-        <Input class="filter-input" placeholder="搜索" v-model="filterVal"/>
+        <Input class="filter-input" placeholder="search" v-model="filterVal"/>
         <div class="tab-list-scroll">
           <Tablist
             class="tab-card"
@@ -55,13 +56,29 @@
         </div>
       </div>
     </div>
+    <Dialog
+      title="New Group"
+      :visible.sync="dialogVisible"
+      :before-close="()=>cancelSaveTabs('ruleForm')"
+      width="450px">
+      <Form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
+        <FormItem label="list name" prop="groupname">
+          <Input placeholder="input a name for new list" v-model="ruleForm.groupname"/>
+        </FormItem>
+      </Form>
+
+      <span slot="footer" class="dialog-footer">
+        <Button @click="cancelSaveTabs('ruleForm')">Cancel</Button>
+        <Button type="primary" @click="confirmSaveTabs('ruleForm')">Confirm</Button>
+      </span>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import Draggable from 'vuedraggable';
-import { saveAllCurrentWIndowTabs } from 'background/utils';
-import { Button, Input, MessageBox } from 'element-ui';
+import { saveAllCurrentWindowTabs } from 'background/utils';
+import { Button, Input, MessageBox, Dialog, Form, FormItem } from 'element-ui';
 import browser from 'webextension-polyfill';
 import Tablist from './tablist';
 
@@ -72,6 +89,16 @@ export default {
       filterVal: '',
       uploading: false,
       downloading: false,
+      dialogVisible: false,
+      withTabs: false,
+      ruleForm: {
+        groupname: '',
+      },
+      rules: {
+        groupname: [
+          { required: true, message: 'can not be empty', trigger: 'blur' },
+        ],
+      },
     };
   },
   components: {
@@ -79,6 +106,9 @@ export default {
     Tablist,
     Button,
     Input,
+    Dialog,
+    Form,
+    FormItem,
   },
   computed: {
     tabstore: {
@@ -95,11 +125,36 @@ export default {
   },
   methods: {
     savetabs() {
-      saveAllCurrentWIndowTabs();
+      saveAllCurrentWindowTabs();
     },
     newlist() {
-      browser.runtime.sendMessage({
-        key: 'newTablist',
+      this.withTabs = false;
+      this.dialogVisible = true;
+    },
+    newlistWithTabs() {
+      this.withTabs = true;
+      this.dialogVisible = true;
+    },
+    cancelSaveTabs(formName) {
+      this.dialogVisible = false;
+      this.$refs[formName].resetFields();
+    },
+    confirmSaveTabs(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.withTabs) {
+            saveAllCurrentWindowTabs(undefined, this.ruleForm.groupname);
+          } else {
+            browser.runtime.sendMessage({
+              key: 'newTablist',
+              payload: { name: this.ruleForm.groupname },
+            });
+          }
+          this.dialogVisible = false;
+          this.$refs[formName].resetFields();
+        } else {
+          return false;
+        }
       });
     },
     changeTabBlock(key, val, index) {

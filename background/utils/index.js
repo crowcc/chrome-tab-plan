@@ -29,7 +29,7 @@ export const openAdminPage = async (windowId) => {
   }
 };
 
-const saveTabs = async (newTabs, windowId) => {
+const saveTabs = async (newTabs, windowId, newTabGroupName) => {
   await openAdminPage(windowId);
   browser.tabs.remove(newTabs.map(item => item.id));
   const tabstore = await browser.storage.local.get('tabstore');
@@ -39,12 +39,20 @@ const saveTabs = async (newTabs, windowId) => {
     });
   }
   newTabs = newTabs.map(item => ({ title: item.title, url: item.url }));
-  const oldTemp = tabstore.tabstore[0].list;
-  tabstore.tabstore[0].list = concat(newTabs, oldTemp);
-  storageHandle.changeTabStore(tabstore.tabstore);
+  if (newTabGroupName) {
+    // storageHandle.newTablist({ name: newTabGroupName, list: newTabs });
+    browser.runtime.sendMessage({
+      key: 'newTablist',
+      payload: { name: newTabGroupName, list: newTabs },
+    });
+  } else {
+    const oldTemp = tabstore.tabstore[0].list;
+    tabstore.tabstore[0].list = concat(newTabs, oldTemp);
+    storageHandle.changeTabStore(tabstore.tabstore);
+  }
 };
 
-export const saveAllCurrentWIndowTabs = async (tab) => {
+export const saveAllCurrentWindowTabs = async (tab, newTabGroupName) => {
   let windowId;
   if (tab) {
     windowId = tab.windowId;
@@ -53,7 +61,7 @@ export const saveAllCurrentWIndowTabs = async (tab) => {
   }
   const tabs = await getTabsByWindow(windowId);
   const normalTbas = tabs.filter(item => (!/^chrome/.test(item.url)));
-  saveTabs(uniqBy(normalTbas, 'url'), windowId);
+  saveTabs(uniqBy(normalTbas, 'url'), windowId, newTabGroupName);
 };
 
 export const saveAllWIndowTabs = async (tab) => {

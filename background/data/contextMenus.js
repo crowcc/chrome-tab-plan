@@ -1,4 +1,4 @@
-import { saveCurrentTab, saveAllCurrentWIndowTabs, saveAllWIndowTabs } from '../utils';
+import { saveCurrentTab, saveAllCurrentWindowTabs, saveAllWIndowTabs } from '../utils';
 
 export const menulist = {
   SAVEONE: {
@@ -10,7 +10,7 @@ export const menulist = {
   SAVECURRENTALL: {
     title: 'storeCurrentWindowTabs',
     action: (tab) => {
-      saveAllCurrentWIndowTabs(tab);
+      saveAllCurrentWindowTabs(tab);
     },
   },
   SAVEALL: {
