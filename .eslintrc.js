@@ -16,10 +16,11 @@ module.exports = {
         'max-len': 0,
         indent: ['error', 2],
         'vue/html-indent': ['error', 2],
-        'vue/script-indent': ['error', 2],
+        'vue/script-indent': 0,
         'import/prefer-default-export':0,
         'import/no-extraneous-dependencies':0,
-        'prefer-destructuring':0
+        'prefer-destructuring':0,
+        'vue/no-parsing-error':0,
     },
     parserOptions: {
         parser: 'babel-eslint',

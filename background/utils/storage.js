@@ -42,8 +42,9 @@ export default class StorageHandle {
     this.storageData.todoVal = payload;
     syncLocalStorage({ todoVal: this.storageData.todoVal });
   }
-  newTablist() {
-    this.storageData.tabstore.push({ title: 'new list', list: [] });
+  newTablist(payload = {}) {
+    console.log(this.storageData.tabstore);
+    this.storageData.tabstore.push({ title: payload.name || 'new list', list: payload.list || [] });
     syncLocalStorage({ tabstore: this.storageData.tabstore });
   }
   changeTabStore(payload) {
